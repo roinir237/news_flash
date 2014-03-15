@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.fbhack.newsflash.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends ActionBarActivity {
 

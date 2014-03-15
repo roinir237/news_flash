@@ -18,4 +18,6 @@ public interface PostDTO {
     public List<String> getLikers();
 
     public double getImportance();
+
+    public boolean hasLoaded();
 }
