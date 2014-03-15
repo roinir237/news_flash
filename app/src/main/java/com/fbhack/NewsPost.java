@@ -50,6 +50,10 @@ public class NewsPost implements PostDTO {
         }
     }
 
+    private Bitmap loadImageAsync(String url) {
+        return null;
+    }
+
     @Override
     public String getName() {
         return null;
