@@ -48,7 +48,7 @@ class Block {
     }
 
     public String toString() {
-        return String.format("{width: %dpx; height: %dpx; left: %dpx; top:%dpx;}", w, h, x, y);
+        return String.format("{width: %dpx; height: %dpx; left: %dpx; top:%dpx;} /*%s*/", w, h, x, y, name);
     }
 }
 
@@ -101,6 +101,27 @@ public class Packing {
         return result;
     }
 
+    static Inp[] bestPermutation;
+    static double bestPermutationScore = 99999999;
+
+    static void permute(java.util.List<Inp> arr, int k){
+        for(int i = k; i < arr.size(); i++){
+            java.util.Collections.swap(arr, i, k);
+            permute(arr, k+1);
+            java.util.Collections.swap(arr, k, i);
+        }
+        double pScore = (arr.get(0).importance + arr.get(1).importance + arr.get(2).importance) - (arr.get(3).importance + arr.get(4).importance + arr.get(5).importance);
+        pScore = Math.abs(pScore);
+        
+//        System.out.println("score="+pScore);
+        if (pScore < bestPermutationScore) {
+            bestPermutationScore = pScore;
+            bestPermutation = arr.toArray(new Inp[1]);
+        }
+    }
+
+
+
     /**
      * LAYOUT:
      * 0   | 4
@@ -115,11 +136,12 @@ public class Packing {
     public static Block[] calc(int screenWidth, int screenHeight, Inp inputs[]) {
 
         Block[] blocks = new Block[6];
-        // todo: sort such that (a+b+c)-(d+e+f) is minumum, where a is the first element, b the second...
-        Arrays.sort(inputs);
 
+        permute(Arrays.asList(inputs), 0);
+
+        inputs = bestPermutation;
         // print inputs
-        for (Inp x : inputs) System.out.println(String.format("input '%s': %f", x.name, x.importance));
+//        for (Inp x : inputs) System.out.println(String.format("input '%s': %f", x.name, x.importance));
 
         double top_importance = sumImportance(0,3,inputs);
         double bottom_importance = sumImportance(3,inputs.length,inputs);
