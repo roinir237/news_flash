@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -18,6 +19,8 @@ import android.widget.ImageView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -34,6 +37,8 @@ public class FlashHead extends Service {
 
     public void onCreate(){
         super.onCreate();
+        Intent i = new Intent();
+        Bundle b = new Bundle();
         LayoutInflater inflater = LayoutInflater.from(this);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -123,7 +128,8 @@ public class FlashHead extends Service {
                             int sheight = displaymetrics.heightPixels;
                             int swidth = displaymetrics.widthPixels;
                             Bitmap pic  = BitmapFactory.decodeResource(getResources(),R.drawable.test);
-                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6,sheight/2 - sheight/6,swidth/3,sheight/3);
+                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6 + 100,sheight/2 - sheight/6 + 100,swidth/3,sheight/3);
+                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6 - 100,sheight/2 - sheight/6 - 100,swidth/3,sheight/3);
                         }
 
                     });

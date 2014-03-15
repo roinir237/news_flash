@@ -36,7 +36,6 @@ public class MainActivity extends ActionBarActivity {
        // populateArrayList(arrayList);
         //countDown(spritz, arrayList);
         startService(new Intent(this, FlashHead.class));
-
     }
 
 

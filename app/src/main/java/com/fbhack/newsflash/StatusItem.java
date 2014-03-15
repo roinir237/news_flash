@@ -10,7 +10,7 @@ import android.widget.TextView;
 /**
  * Created by roinir on 15/03/2014.
  */
-public class StatusItem extends CardItem {
+public class StatusItem extends CardItem{
     private final String status;
     private final Bitmap pic;
 
