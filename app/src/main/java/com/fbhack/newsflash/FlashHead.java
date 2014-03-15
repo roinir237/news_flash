@@ -1,9 +1,13 @@
 package com.fbhack.newsflash;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,12 +19,17 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 
+import java.util.ArrayList;
+
 public class FlashHead extends Service {
     private static final String TAG = "FlashHead";
     private WindowManager windowManager;
     private View flashHead;
 
+    private ArrayList<CardItem> cards;
+
     public FlashHead() {
+        cards = new ArrayList<CardItem>();
     }
 
     public void onCreate(){
@@ -40,7 +49,6 @@ public class FlashHead extends Service {
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 0;
         params.y = 100;
-
 
         windowManager.addView(flashHead, params);
         final ImageView flashIcon = (ImageView) flashHead.findViewById(R.id.flash_head);
@@ -110,7 +118,12 @@ public class FlashHead extends Service {
                         @Override
                         public void onSpringAtRest(Spring spring) {
                             super.onSpringAtRest(spring);
-                            addCard(0, 300, 150, 200);
+                            DisplayMetrics displaymetrics = new DisplayMetrics();
+                            ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displaymetrics);
+                            int sheight = displaymetrics.heightPixels;
+                            int swidth = displaymetrics.widthPixels;
+                            Bitmap pic  = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6,sheight/2 - sheight/6,swidth/3,sheight/3);
                         }
 
                     });
@@ -125,27 +138,27 @@ public class FlashHead extends Service {
                 } else {
                     params.flags ^= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
                     windowManager.updateViewLayout(flashHead, params);
+                    removeAllCards();
                     fullscreen = !fullscreen;
                 }
             }
         });
     }
 
-    public void addCard(int x, int y, int w, int h){
-        View card = LayoutInflater.from(FlashHead.this).inflate(R.layout.item_card, null);
-        WindowManager.LayoutParams cardParams = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
+    public void addStatusCard(Bitmap pic, String status,int x, int y, int w, int h){
+        StatusItem card = new StatusItem(this,pic,status);
+        card.setDims(h,w);
+        card.setPosition(x,y);
+        cards.add(card);
+        card.addCard(windowManager);
+    }
 
-        cardParams.gravity = Gravity.TOP | Gravity.LEFT;
-        cardParams.x = x;
-        cardParams.y = y;
-        cardParams.height = h;
-        cardParams.width = w;
-        windowManager.addView(card, cardParams);
+    public void removeAllCards(){
+        for(CardItem card : cards){
+            card.removeCard(windowManager);
+        }
+
+        cards = new ArrayList<CardItem>();
     }
 
     public void onDestroy(){
