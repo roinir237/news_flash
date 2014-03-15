@@ -27,6 +27,9 @@ import com.facebook.LoggingBehavior;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
+import com.fbhack.services.NewsFeedService;
+
+import java.util.Arrays;
 
 public class LoginUsingActivityActivity extends Activity {
     private static final String URL_PREFIX_FRIENDS = "https://graph.facebook.com/me/friends?access_token=";
@@ -49,12 +52,17 @@ public class LoginUsingActivityActivity extends Activity {
             if (savedInstanceState != null) {
                 session = Session.restoreSession(this, null, statusCallback, savedInstanceState);
             }
+
             if (session == null) {
                 session = new Session(this);
             }
+
             Session.setActiveSession(session);
             if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-                session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
+                Session.OpenRequest request = new Session.OpenRequest(this);
+                request.setPermissions(Arrays.asList("user_groups"));
+                request.setCallback(statusCallback);
+                session.openForRead(request);
             }
         }
 

@@ -9,15 +9,26 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="Login"
         android:id="@+id/button"
-        android:layout_gravity="center_horizontal|top" />
-</FrameLayout>
+        android:layout_gravity="center_horizontal|top"
+        android:layout_below="@+id/spritz_view"
+        android:layout_toRightOf="@+id/service"
+        android:layout_marginTop="77dp" />
 
     <TextView
         android:id="@+id/spritz_view"
         android:text="@string/hello_world"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-</RelativeLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start service"
+        android:id="@+id/service"
+        android:layout_gravity="center"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="46dp" />
+</RelativeLayout>
