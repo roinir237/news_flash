@@ -1,4 +1,7 @@
+package com.fbhack.processing;
+
 import java.util.*;
+import com.fbhack.*;
 
 class Block {
     public int x;
@@ -39,12 +42,12 @@ public class Packing {
         int vcut = optimal_cut(inputs[from].getImportance(), inputs[from+1].getImportance() + inputs[from+2].getImportance(), w);
         int side_width = w-vcut;
 
-        result[0] = new Block(inputs[from].getPostDTO(), first_row ? 0 : side_width, top_offset, vcut, h);
+        result[0] = new Block(inputs[from], first_row ? 0 : side_width, top_offset, vcut, h);
 
         int hcut = optimal_cut(inputs[from+1].getImportance(), inputs[from+2].getImportance(), side_width);
-        result[1] = new Block(inputs[from+1].getPostDTO(), first_row ? vcut : 0, top_offset, side_width, hcut);
+        result[1] = new Block(inputs[from+1], first_row ? vcut : 0, top_offset, side_width, hcut);
 
-        result[2] = new Block(inputs[from+2].getPostDTO(), first_row ? vcut : 0, top_offset + hcut, side_width, h-hcut);
+        result[2] = new Block(inputs[from+2], first_row ? vcut : 0, top_offset + hcut, side_width, h-hcut);
 
         return result;
     }
