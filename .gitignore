@@ -1,4 +1,22 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
+*.apk
+*.ap_
+
+# any class files
+*.class
+
+# Macs...
 .DS_Store
+facebook/build
+
+# Android Studio
+.idea/
+.gradle
+/*/local.properties
+/*/out
+/*/*/build
+/*/*/production
+*.iml
+*.iws
+*.ipr
+*~
+*.swp
