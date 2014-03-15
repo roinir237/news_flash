@@ -1,12 +1,14 @@
 package com.fbhack;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class NewsPost implements PostDTO {
     private double importance;
 
 
-    public NewsPost(JSONObject post) throws JSONException {
+    public NewsPost(final JSONObject post) throws JSONException {
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         name = post.getJSONObject("from").getString("name");
@@ -37,14 +39,27 @@ public class NewsPost implements PostDTO {
             loadLikers(post.getJSONObject("likes").getJSONArray("data"));
 
         String fromId = post.getJSONObject("from").getString("id");
-        String profUrl = "http://graph.facebook.com/" + fromId + "/picture";
+        final String profUrl = "http://graph.facebook.com/" + fromId + "/picture";
 
-        loadImageAsync(profilePic, profUrl);
+        new Thread(new Runnable() {
 
-        if (post.has("picture")) {
-            hasImage = true;
-            loadImageAsync(image, post.getString("picture"));
-        }
+            @Override
+            public void run() {
+                profilePic = fetchImage(profUrl);
+
+                if (post.has("picture")) {
+                    hasImage = true;
+
+                    try {
+                        image = fetchImage(post.getString("picture"));
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                Log.e(NewsPost.class.toString(), "Finished loading images");
+            }
+        }).start();
     }
 
     private void loadLikers(JSONArray likersJson) throws JSONException {
@@ -55,8 +70,18 @@ public class NewsPost implements PostDTO {
         }
     }
 
-    private void loadImageAsync(Bitmap bitmap, String url) {
+    private Bitmap fetchImage(String url) {
+        Bitmap bitmap = null;
 
+        try {
+            InputStream in = new java.net.URL(url).openStream();
+            bitmap = BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+
+        return bitmap;
     }
 
     @Override
