@@ -1,6 +1,8 @@
 package com.fbhack.newsflash;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -25,7 +27,11 @@ import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.fbhack.services.NewsFeedService;
 
-import java.util.Arrays;
+import android.widget.TextView;
+
+import com.fbhack.newsflash.R;
+
+import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -34,12 +40,15 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
-
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.container, new PlaceholderFragment())
+//                    .commit();
+//        }
+        //TextView spritz = (TextView) findViewById(R.id.spritz_view);
+        //ArrayList<CharSequence> arrayList = new ArrayList<CharSequence>();
+       // populateArrayList(arrayList);
+        //countDown(spritz, arrayList);
         startService(new Intent(this, FlashHead.class));
 
         Button buttonLoginActivity = (Button) findViewById(R.id.button);
@@ -81,6 +90,39 @@ public class MainActivity extends ActionBarActivity {
         intent.putExtra("session", session);
 
         this.startService(intent);
+    }
+
+    private void populateArrayList(ArrayList<CharSequence> arrayList) {
+        arrayList.add("Make");
+        arrayList.add("sure");
+        arrayList.add("you've");
+        arrayList.add("installed");
+        arrayList.add("the");
+        arrayList.add("following");
+        arrayList.add("from");
+        arrayList.add("the");
+        arrayList.add("Android");
+        arrayList.add("SDK");
+        arrayList.add("Manager");
+        arrayList.add("before");
+        arrayList.add("building");
+    }
+
+    private void countDown(final TextView spritz, final ArrayList<CharSequence> arrayList) {
+        CountDownTimer timer = new CountDownTimer(1000, 1000) {
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                spritz.setText(arrayList.get(0));
+                arrayList.remove(0);
+                if (arrayList.size() != 0)
+                    countDown(spritz, arrayList);
+            }
+        }.start();
     }
 
     @Override
