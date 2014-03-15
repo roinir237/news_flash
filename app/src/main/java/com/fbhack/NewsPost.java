@@ -1,6 +1,7 @@
 package com.fbhack;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +27,11 @@ public class NewsPost implements PostDTO {
 
 
     public NewsPost(JSONObject post) throws JSONException {
+        Log.d(this.getClass().toString(), "Loading NewsPost");
+
         name = post.getJSONObject("from").getString("name");
-        status = post.getString("message");
+
+        status = post.has("message") ? post.getString("message") : "";
 
         if (post.has("likes"))
             loadLikers(post.getJSONObject("likes").getJSONArray("data"));
@@ -35,10 +39,12 @@ public class NewsPost implements PostDTO {
         String fromId = post.getJSONObject("from").getString("id");
         String profUrl = "http://graph.facebook.com/" + fromId + "/picture";
 
-        profilePic = loadImageAsync(profUrl);
+        loadImageAsync(profilePic, profUrl);
 
-        
-        image = loadImageAsync(profUrl);
+        if (post.has("picture")) {
+            hasImage = true;
+            loadImageAsync(image, post.getString("picture"));
+        }
     }
 
     private void loadLikers(JSONArray likersJson) throws JSONException {
@@ -46,37 +52,36 @@ public class NewsPost implements PostDTO {
         for (int i = 0; i < likersJson.length(); i++) {
             JSONObject liker = likersJson.getJSONObject(i);
             likers.add(liker.getString("name"));
-
         }
     }
 
-    private Bitmap loadImageAsync(String url) {
-        return null;
+    private void loadImageAsync(Bitmap bitmap, String url) {
+
     }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public String getStatus() {
-        return null;
+        return status;
     }
 
     @Override
     public Bitmap getProfilePicture() {
-        return null;
+        return profilePic;
     }
 
     @Override
     public Bitmap getPostedImage() {
-        return null;
+        return image;
     }
 
     @Override
     public List<String> getLikers() {
-        return null;
+        return likers;
     }
 
     @Override
@@ -86,6 +91,6 @@ public class NewsPost implements PostDTO {
 
     @Override
     public boolean hasLoaded() {
-        return false;
+        return hasImage ? image != null : profilePic != null;
     }
 }

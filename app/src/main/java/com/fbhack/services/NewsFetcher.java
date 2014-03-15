@@ -1,5 +1,7 @@
 package com.fbhack.services;
 
+import android.util.Log;
+
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -27,6 +29,9 @@ public class NewsFetcher {
         startFetching();
     }
 
+    /**
+     * At the moment this just does one fetch.
+     */
     private void startFetching() {
         new Thread(new Runnable() {
             @Override
@@ -35,6 +40,8 @@ public class NewsFetcher {
                     // If we want to put extra options
 //                Bundle options = new Bundle();
 //                options.putInt("limit", 10);
+
+                    Log.d(NewsFetcher.class.toString(), "Awaiting response");
                     Response res = new Request(
                             Session.getActiveSession(),
                             "/me/home",
@@ -42,8 +49,12 @@ public class NewsFetcher {
                             HttpMethod.GET
                     ).executeAndWait();
 
-                    if (res.getError() != null)
+                    Log.d(NewsFetcher.class.toString(), "Received response");
+
+                    if (res.getError() == null)
                         processResponse(res);
+                    else
+                        Log.e(NewsFetcher.class.toString(), "Error getting response");
 
                     try {
                         Thread.sleep(10000);
@@ -51,10 +62,12 @@ public class NewsFetcher {
 
                     }
 
+                    Log.d(NewsFetcher.class.toString(), "Finished loading feed");
+
                     break;
                 }
             }
-        });
+        }).start();
     }
 
     private void processResponse(Response response) {
@@ -66,7 +79,7 @@ public class NewsFetcher {
                 processPost(post);
             }
         } catch (JSONException exc) {
-
+            Log.e(NewsFetcher.class.toString(), exc.getLocalizedMessage());
         }
     }
 
