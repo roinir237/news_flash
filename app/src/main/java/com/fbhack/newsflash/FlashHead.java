@@ -100,8 +100,8 @@ public class FlashHead extends Service {
                         @Override
                         public void onSpringUpdate(Spring spring) {
                             float value = (float) spring.getCurrentValue();
-                            int xi = (int) (initialX - value*(initialX - finalX));
-                            int yi = (int) (initialY - value*(initialY - finalY));
+                            int xi = (int) (initialX - value * (initialX - finalX));
+                            int yi = (int) (initialY - value * (initialY - finalY));
                             params.x = xi;
                             params.y = yi;
                             windowManager.updateViewLayout(flashHead, params);
@@ -110,35 +110,42 @@ public class FlashHead extends Service {
                         @Override
                         public void onSpringAtRest(Spring spring) {
                             super.onSpringAtRest(spring);
-                            params.dimAmount = 0.8f;
-                            params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-//                            params.width = WindowManager.LayoutParams.MATCH_PARENT;
-//                            params.height = WindowManager.LayoutParams.MATCH_PARENT;
-                            windowManager.updateViewLayout(flashHead, params);
-//                            flashHead.setBackgroundColor(0xAAFFFFFF);
-//                            RelativeLayout.LayoutParams flashIconParams = (RelativeLayout.LayoutParams) flashIcon.getLayoutParams();
-//                            flashIconParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                            flashIconParams.setMargins(0,finalY,0,0);
-//                            flashIcon.setLayoutParams(flashIconParams);
-                            fullscreen = true;
+                            addCard(0, 300, 150, 200);
                         }
+
                     });
 
                     spring.setEndValue(1);
+
+                    params.dimAmount = 0.8f;
+                    params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+                    windowManager.updateViewLayout(flashHead, params);
+                    fullscreen = true;
+
                 } else {
                     params.flags ^= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-//                    flashHead.setBackgroundColor(0x00FFFFFF);
-//                    params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-//                    params.height = WindowManager.LayoutParams.WRAP_CONTENT;
                     windowManager.updateViewLayout(flashHead, params);
-//                    RelativeLayout.LayoutParams flashIconParams = (RelativeLayout.LayoutParams) flashIcon.getLayoutParams();
-//                    flashIconParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-//                    flashIconParams.setMargins(0,0,0,0);
-//                    flashIcon.setLayoutParams(flashIconParams);
                     fullscreen = !fullscreen;
                 }
             }
         });
+    }
+
+    public void addCard(int x, int y, int w, int h){
+        View card = LayoutInflater.from(FlashHead.this).inflate(R.layout.item_card, null);
+        WindowManager.LayoutParams cardParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+        cardParams.gravity = Gravity.TOP | Gravity.LEFT;
+        cardParams.x = x;
+        cardParams.y = y;
+        cardParams.height = h;
+        cardParams.width = w;
+        windowManager.addView(card, cardParams);
     }
 
     public void onDestroy(){
