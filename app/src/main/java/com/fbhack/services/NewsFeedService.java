@@ -23,18 +23,11 @@ public class NewsFeedService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Session currentSession = Session.getActiveSession();
-        new Request(
-                currentSession,
-                "/me/home",
-                null,
-                HttpMethod.GET,
-                new Request.Callback() {
-                    public void onCompleted(Response response) {
-                        int i = 0;
-                    }
-                }
-        ).executeAsync();
 
+        
+
+
+        int i = 0;
     }
+
 }

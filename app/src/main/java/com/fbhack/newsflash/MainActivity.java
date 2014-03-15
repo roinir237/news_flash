@@ -60,28 +60,44 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        mySession();
+        Button buttonService = (Button) findViewById(R.id.service);
+        buttonService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NewsFeedService.class);
+                startService(intent);
+            }
+        });
+
+//        mySession();
     }
 
     private void mySession() {
         Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
         Session session = Session.getActiveSession();
-        
+
         if (session == null) {
             session = new Session(this);
-
-            Session.setActiveSession(session);
-            if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-                session.openForRead(new Session.OpenRequest(this).setCallback(new Session.StatusCallback() {
-                    @Override
-                    public void call(Session session, SessionState state, Exception exception) {
-                        if (session.isOpened())
-                            startSessionIntent(session);
-                    }
-                }));
-            }
         }
+
+        Session.setActiveSession(session);
+        if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+            Session.OpenRequest request = new Session.OpenRequest(this);
+            request.setPermissions(Arrays.asList("user_groups"));
+            request.setCallback(new Session.StatusCallback() {
+                @Override
+                public void call(Session session, SessionState state, Exception exception) {
+                    if (session.isOpened())
+                        startSessionIntent(session);
+                }
+            });
+
+            session.openForRead(request);
+        }
+
+        if (session.isOpened())
+            startSessionIntent(session);
     }
 
     private void startSessionIntent(Session session) {
