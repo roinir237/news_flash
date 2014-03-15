@@ -1,5 +1,6 @@
 package com.fbhack.newsflash;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,8 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
+        startService(new Intent(this, FlashHead.class));
     }
 
 
