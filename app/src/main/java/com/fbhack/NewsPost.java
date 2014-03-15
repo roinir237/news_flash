@@ -86,7 +86,7 @@ public class NewsPost implements PostDTO {
 
     @Override
     public double getImportance() {
-        return 0;
+        return likers.size();
     }
 
     @Override
