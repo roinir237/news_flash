@@ -1,6 +1,6 @@
 import java.util.*;
 
-class Inp implements Comparable {
+class Inp implements Comparable<Inp> {
     double importance;
     double ratio;
     String name;
@@ -14,7 +14,7 @@ class Inp implements Comparable {
     }
 
     public int compareTo(Inp o) {
-        return new Double(this.importance).compareTo(o.importance);
+        return -(new Double(this.importance).compareTo(o.importance));
     }
 }
 
@@ -25,18 +25,18 @@ class Block {
     int h;
     String name;
 
-    public Block(Root r, Inp c) {
+    public Block(int sw, int sh, Inp c) {
         // compute 'perfect' size from percentages
         double ratio = c.ratio;
         double perc = c.importance;
-        int screenSize = r.w * r.h;
+        int screenSize = sw * sh;
         double blockSize = perc * screenSize;
 
         double height = Math.sqrt(blockSize / perc);
         double width = perc * height;
 
-        this.w = Math.round(width);
-        this.h = Math.round(height);
+        this.w = (int)Math.round(width);
+        this.h = (int)Math.round(height);
     }
 
     public Block(String name, int x, int y, int w, int h) {
@@ -46,49 +46,94 @@ class Block {
         this.w = w;
         this.h = h;
     }
-}
 
-class Screen {
-    int w;
-    int h;
-    int x;
-    int y;
-
-    Root root;
-    ArrayList<Screen> children;
-
-    public Screen(Root r, int w, int h, int x, int y) {
-        this.root = r;
-        this.w=w;
-        this.h=h;
-        this.x=x;
-        this.y=y;
-        children = new ArrayList<Screen>();
-    }
-
-    double getRatio() {
-        return (double)w/h;
-    }
-   
-    int getSize() { return w*h; }
-
-    public boolean insert(Block b) {
-    }
-}
-
-class Root extends Screen {
-    ArrayList<Block> blocks = new ArrayList<Block>();
-    public Root(int w, int h) {
-        super(this, w, h, 0, 0);
+    public String toString() {
+        return String.format("{width: %dpx; height: %dpx; left: %dpx; top:%dpx;}", w, h, x, y);
     }
 }
 
 public class Packing {
-
-    public static Block[] calc(int screenWidth, int screenHeight, Inp inputs[]) {
-        Root root = new Root();
+    public static void main(String... args) {
+    
+        Inp inputs[] = new Inp[6];
+        inputs[0] = new Inp("first 30", 0.3, 1);
+        inputs[1] = new Inp("second 20", 0.2, 1);
+        inputs[2] = new Inp("second 12", 0.12, 1);
+        inputs[3] = new Inp("second 13", 0.13, 1);
+        inputs[4] = new Inp("second 09", 0.09, 1);
+        inputs[5] = new Inp("second 16", 0.16, 1);
+   
+        Block result[] = calc(480, 800, inputs);
+        int i=1;
+        for (Block b : result) { System.out.print("#d"+(i++)+" "); System.out.println(b);  }
+ 
     }
 
+    public static int optimal_cut(double i1, double i2, int size) {
+        double total = i1+i2;
+        double cut = i1/total;
+        return (int)Math.round(size*cut);
+    }
+
+    public static double sumImportance(int from, int to, Inp inputs[]) {
+        double imp = 0;
+        for (int i=from;i<to;i++) {
+            imp+=inputs[i].importance;
+        }
+        return imp;
+    }
+
+    public static Block[] compute_row(int from, int w, int h, int top_offset, Inp inputs[]) {
+        Block[] result = new Block[3];
+        
+        boolean first_row = from == 0;
+        
+        int vcut = optimal_cut(inputs[from].importance, inputs[from+1].importance + inputs[from+2].importance, w);
+        int side_width = w-vcut;
+
+        result[0] = new Block(inputs[from].name, first_row ? 0 : side_width, top_offset, vcut, h);
+
+        int hcut = optimal_cut(inputs[from+1].importance, inputs[from+2].importance, side_width);
+        result[1] = new Block(inputs[from+1].name, first_row ? vcut : 0, top_offset, side_width, hcut);
+
+        result[2] = new Block(inputs[from+2].name, first_row ? vcut : 0, top_offset + hcut, side_width, h-hcut);
+
+        return result;
+    }
+
+    /**
+     * LAYOUT:
+     * 0   | 4
+     *     |__
+     *     | 5
+     * ____|__
+     * 2 |1 
+     * __|
+     * 3 |
+     * __|____
+     */
+    public static Block[] calc(int screenWidth, int screenHeight, Inp inputs[]) {
+
+        Block[] blocks = new Block[6];
+        // todo: sort such that (a+b+c)-(d+e+f) is minumum, where a is the first element, b the second...
+        Arrays.sort(inputs);
+
+        // print inputs
+        for (Inp x : inputs) System.out.println(String.format("input '%s': %f", x.name, x.importance));
+
+        double top_importance = sumImportance(0,3,inputs);
+        double bottom_importance = sumImportance(3,inputs.length,inputs);
+
+        int row_cut = optimal_cut(top_importance, bottom_importance, screenHeight);
+
+        Block top[] = compute_row(0, screenWidth, row_cut, 0, inputs);
+        Block bottom[] = compute_row(3, screenWidth, screenHeight-row_cut, row_cut, inputs); 
+
+        for (int i=0;i<3;i++) blocks[i]=top[i];
+        for (int i=3;i<6;i++) blocks[i]=bottom[i-3];
+
+        return blocks;
+    }
 
 }
 
