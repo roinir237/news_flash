@@ -36,6 +36,8 @@ public class NewsPost implements PostDTO {
 
 
     public NewsPost(JSONObject post) throws JSONException {
+        likers = new LinkedList<String>();
+        commenters = new LinkedList<String>();
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         name = post.getJSONObject("from").getString("name");
