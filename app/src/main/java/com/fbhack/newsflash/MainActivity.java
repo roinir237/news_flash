@@ -1,45 +1,55 @@
 package com.fbhack.newsflash;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.CountDownTimer;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
-import android.widget.Button;
 
-import com.facebook.HttpMethod;
-import com.facebook.LoggingBehavior;
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.SessionDefaultAudience;
-import com.facebook.SessionLoginBehavior;
-import com.facebook.SessionState;
-import com.facebook.Settings;
-import com.fbhack.services.NewsFeedService;
+        import android.app.Activity;
+        import android.content.Intent;
+        import android.os.CountDownTimer;
+        import android.support.v7.app.ActionBarActivity;
+        import android.support.v7.app.ActionBar;
+        import android.support.v4.app.Fragment;
+        import android.os.Bundle;
+        import android.util.Log;
+        import android.view.LayoutInflater;
+        import android.view.Menu;
+        import android.view.MenuItem;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.os.Build;
+        import android.widget.Button;
 
-import android.widget.TextView;
 
-import com.fbhack.newsflash.R;
+        import com.facebook.HttpMethod;
+        import com.facebook.LoggingBehavior;
+        import com.facebook.Request;
+        import com.facebook.Response;
+        import com.facebook.Session;
+        import com.facebook.SessionDefaultAudience;
+        import com.facebook.SessionLoginBehavior;
+        import com.facebook.SessionState;
+        import com.facebook.Settings;
+        import com.fbhack.services.NewsFeedService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+
+        import android.widget.TextView;
+
+
+        import com.fbhack.newsflash.R;
+
+
+        import java.util.ArrayList;
+        import java.util.Arrays;
+
 
 public class MainActivity extends ActionBarActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SpritzerTextView spritz = (SpritzerTextView) findViewById(R.id.spritz_view);
+        Spritzer spritzer = new Spritzer(spritz);
 
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
@@ -48,9 +58,10 @@ public class MainActivity extends ActionBarActivity {
 //        }
         //TextView spritz = (TextView) findViewById(R.id.spritz_view);
         //ArrayList<CharSequence> arrayList = new ArrayList<CharSequence>();
-       // populateArrayList(arrayList);
+        // populateArrayList(arrayList);
         //countDown(spritz, arrayList);
         startService(new Intent(this, FlashHead.class));
+
 
         Button buttonLoginActivity = (Button) findViewById(R.id.button);
         buttonLoginActivity.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +72,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+
         Button buttonService = (Button) findViewById(R.id.service);
         buttonService.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,17 +82,22 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+
 //        mySession();
     }
+
 
     private void mySession() {
         Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
+
         Session session = Session.getActiveSession();
+
 
         if (session == null) {
             session = new Session(this);
         }
+
 
         Session.setActiveSession(session);
         if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
@@ -94,20 +111,25 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
+
             session.openForRead(request);
         }
+
 
         if (session.isOpened())
             startSessionIntent(session);
     }
+
 
     private void startSessionIntent(Session session) {
         Session.setActiveSession(session);
         Intent intent = new Intent(this, NewsFeedService.class);
         intent.putExtra("session", session);
 
+
         this.startService(intent);
     }
+
 
     private void populateArrayList(ArrayList<CharSequence> arrayList) {
         arrayList.add("Make");
@@ -125,12 +147,15 @@ public class MainActivity extends ActionBarActivity {
         arrayList.add("building");
     }
 
+
     private void countDown(final TextView spritz, final ArrayList<CharSequence> arrayList) {
         CountDownTimer timer = new CountDownTimer(1000, 1000) {
             @Override
             public void onTick(long l) {
 
+
             }
+
 
             @Override
             public void onFinish() {
@@ -142,13 +167,15 @@ public class MainActivity extends ActionBarActivity {
         }.start();
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -162,20 +189,24 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
 
+
         public PlaceholderFragment() {
         }
 
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
     }
+
 
 }
