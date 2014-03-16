@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:typeface="monospace"
-        android:background="@drawable/spritz_bg"/>
+        android:background="#B7070707"/>
 
 </LinearLayout>
