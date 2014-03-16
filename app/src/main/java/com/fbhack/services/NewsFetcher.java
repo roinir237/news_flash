@@ -12,6 +12,7 @@ import com.facebook.Session;
 import com.fbhack.NewsPost;
 import com.fbhack.PostDTO;
 
+import org.apache.http.util.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

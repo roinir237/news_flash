@@ -21,10 +21,10 @@ import com.facebook.rebound.SpringUtil;
 public abstract class CardItem{
     private WindowManager.LayoutParams params;
     private Context mContext;
-    private View view;
     private boolean centered = false;
     private int originalX;
     private int originalY;
+    protected View view;
 
     protected abstract View getView();
 
@@ -181,6 +181,13 @@ public abstract class CardItem{
                 params.y = y;
                 windowManager.updateViewLayout(view, params);
             }
+
+            @Override
+            public void onSpringAtRest(Spring spring) {
+                super.onSpringAtRest(spring);
+
+                CardItem.this.swapView(windowManager);
+            }
         });
 
         windowManager.removeView(view);
@@ -188,6 +195,8 @@ public abstract class CardItem{
 
         spring.setEndValue(1);
     }
+
+    public abstract void swapView(WindowManager windowManager);
 
     public void decenterCard(final WindowManager windowManager, View overlay) {
         windowManager.removeView(overlay);
@@ -200,6 +209,13 @@ public abstract class CardItem{
         SpringSystem springSystem = SpringSystem.create();
         Spring spring = springSystem.createSpring();
         spring.addListener(new SimpleSpringListener() {
+
+            @Override
+            public void onSpringActivate(Spring spring) {
+                super.onSpringActivate(spring);
+                
+                CardItem.this.swapView(windowManager);
+            }
 
             @Override
             public void onSpringUpdate(Spring spring) {
