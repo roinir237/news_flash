@@ -1,19 +1,25 @@
 package com.fbhack.newsflash;
 
+import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 import com.facebook.rebound.SpringUtil;
+import com.nineoldandroids.animation.ObjectAnimator;
 
 /**
  * Created by roinir on 15/03/2014.
@@ -109,15 +115,29 @@ public abstract class CardItem{
         final int finalX = params.x;
         final int finalY = params.y;
 
-        params.width = 0;
-        params.height = 0;
-        params.x = finalX + finalWidth/2;
-        params.y = finalY + finalHeight/2;
+//        params.width = 0;
+//        params.height = 0;
+//        params.x = finalX + finalWidth/2;
+//        params.y = finalY + finalHeight/2;
 
         SpringSystem springSystem = SpringSystem.create();
         Spring spring = springSystem.createSpring();
 
         windowManager.addView(view,params);
+
+        ImageView preview = (ImageView) view.findViewById(R.id.preview_pic);
+        if(preview != null){
+            Bitmap previewBmp = ((BitmapDrawable)preview.getDrawable()).getBitmap();
+            int previewWidth = ((BitmapDrawable)preview.getDrawable()).getBitmap().getWidth();
+            int previewHeight = ((BitmapDrawable)preview.getDrawable()).getBitmap().getHeight();
+            int containerWidth = finalWidth;
+            float ratio = containerWidth*previewHeight/previewWidth;
+            preview.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, containerWidth, (int)(ratio), false));
+        } else {
+            int containerWidth = finalWidth;
+
+        }
+
 
         spring.addListener(new SimpleSpringListener() {
 
@@ -138,7 +158,7 @@ public abstract class CardItem{
                 windowManager.updateViewLayout(view, params);
             }
         });
-        SpringConfig config = new SpringConfig(50,7);
+        SpringConfig config = new SpringConfig(50,10);
         spring.setSpringConfig(config);
         spring.setEndValue(1);
     }
