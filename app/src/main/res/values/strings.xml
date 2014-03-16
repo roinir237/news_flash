@@ -4,5 +4,10 @@
     <string name="app_name">News Flash</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="app_id">1554328074793063</string>
+
+    <string name="login">login</string>
+    <string name="logout">logout</string>
+    <string name="instructions">1554328074793063</string>
 
 </resources>
