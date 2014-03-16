@@ -34,7 +34,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlashHead extends Service {
+public class FlashHead extends Service implements CardItem.CardsChangedCallback {
+
+
     private static final String TAG = "FlashHead";
     private WindowManager windowManager;
     private View flashHead;
@@ -138,6 +140,7 @@ public class FlashHead extends Service {
                             params.x = xi;
                             params.y = yi;
                             windowManager.updateViewLayout(flashHead, params);
+
                         }
 
                         @Override
@@ -146,15 +149,18 @@ public class FlashHead extends Service {
 
                             List<PostDTO> posts = newsFetcher.getPosts();
                             showPosts(posts);
+                            windowManager.removeView(flashHead);
+                            windowManager.addView(flashHead,params);
                         }
 
                     });
 
                     spring.setEndValue(1);
 
-                    params.dimAmount = 0.8f;
-                    params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-                    windowManager.updateViewLayout(flashHead, params);
+//                    params.dimAmount = 0.8f;
+//                    params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+//                    windowManager.updateViewLayout(flashHead, params);
+
                     fullscreen = true;
 
                 } else {
@@ -174,15 +180,23 @@ public class FlashHead extends Service {
         int swidth = displaymetrics.widthPixels;
         Block[] blocks = Packing.calc(swidth,sheight,posts);
 
+
+        float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+
         for(Block block : blocks){
             Log.d("FlashHead",String.format("%d, %d, %d, %d",block.x,block.y,block.w,block.h));
+            int width = (int) (block.w - margin*2);
+            int height = (int) (block.h - margin*2);
+            int x = (int)(block.x + margin);
+            int y = (int) (block.y + margin);
+
             addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),
-                    block.x, block.y, block.w, block.h);
+                    x,y,width,height);
         }
     }
 
     public void addStatusCard(Bitmap pic, String status,int x, int y, int w, int h){
-        StatusItem card = new StatusItem(this,pic,status);
+        StatusItem card = new StatusItem(this,this,pic,status);
         card.setDims(h,w);
         card.setPosition(x,y);
         cards.add(card);
@@ -206,5 +220,35 @@ public class FlashHead extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void cardCentered(CardItem card) {
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
+        int swidth = displaymetrics.widthPixels;
+        final WindowManager.LayoutParams params = (WindowManager.LayoutParams) flashHead.getLayoutParams();
+
+        final int initialX = params.x;
+        if(initialX >= card.getParams().x && initialX <= card.getParams().x + card.getParams().width){
+            final int finalX = initialX > swidth / 2 ? swidth:0;
+
+            SpringSystem springSystem = SpringSystem.create();
+            Spring spring = springSystem.createSpring();
+            spring.addListener(new SimpleSpringListener() {
+
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    float value = (float) spring.getCurrentValue();
+                    int xi = (int) (initialX - value * (initialX - finalX));
+                    params.x = xi;
+                    windowManager.updateViewLayout(flashHead, params);
+
+                }
+
+            });
+
+            spring.setEndValue(1);
+        }
     }
 }
