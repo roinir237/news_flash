@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
         SpritzerTextView spritz = (SpritzerTextView) findViewById(R.id.spritz_view);
         Spritzer spritzer = new Spritzer(spritz);
 
+
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PlaceholderFragment())
@@ -72,42 +73,48 @@ public class MainActivity extends ActionBarActivity {
 //        mySession();
     }
 
-    private void populateArrayList(ArrayList<CharSequence> arrayList) {
-        arrayList.add("Make");
-        arrayList.add("sure");
-        arrayList.add("you've");
-        arrayList.add("installed");
-        arrayList.add("the");
-        arrayList.add("following");
-        arrayList.add("from");
-        arrayList.add("the");
-        arrayList.add("Android");
-        arrayList.add("SDK");
-        arrayList.add("Manager");
-        arrayList.add("before");
-        arrayList.add("building");
+    private void mySession() {
+        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+
+
+        Session session = Session.getActiveSession();
+
+
+        if (session == null) {
+            session = new Session(this);
+        }
+
+
+        Session.setActiveSession(session);
+        if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+            Session.OpenRequest request = new Session.OpenRequest(this);
+            request.setPermissions(Arrays.asList("user_groups"));
+            request.setCallback(new Session.StatusCallback() {
+                @Override
+                public void call(Session session, SessionState state, Exception exception) {
+                    if (session.isOpened())
+                        startSessionIntent(session);
+                }
+            });
+
+
+            session.openForRead(request);
+        }
+
+
+        if (session.isOpened())
+            startSessionIntent(session);
     }
 
 
-    private void countDown(final TextView spritz, final ArrayList<CharSequence> arrayList) {
-        CountDownTimer timer = new CountDownTimer(1000, 1000) {
-            @Override
-            public void onTick(long l) {
+    private void startSessionIntent(Session session) {
+        Session.setActiveSession(session);
+        Intent intent = new Intent(this, NewsFeedService.class);
+        intent.putExtra("session", session);
 
 
-            }
-
-
-            @Override
-            public void onFinish() {
-                spritz.setText(arrayList.get(0));
-                arrayList.remove(0);
-                if (arrayList.size() != 0)
-                    countDown(spritz, arrayList);
-            }
-        }.start();
+        this.startService(intent);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

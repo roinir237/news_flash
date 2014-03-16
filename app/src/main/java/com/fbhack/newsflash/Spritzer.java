@@ -14,9 +14,16 @@ import java.util.ArrayList;
  * Created by Dorota on 16/03/14.
  */
 public class Spritzer {
+    CountDownTimer timer;
 
     protected Spritzer(SpritzerTextView spritz) {
         ArrayList<String> arrayList = populateArrayList();
+        spritz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timer.cancel();
+            }
+        });
         countDown(spritz, arrayList);
     }
 
@@ -76,7 +83,7 @@ public class Spritzer {
     private void countDown(final SpritzerTextView spritz, final ArrayList<String> arrayList) {
         final String word = arrayList.get(0);
 
-        new CountDownTimer(1000, 1000) {
+        timer = new CountDownTimer(1000, 1000) {
             @Override
             public void onTick(long l) {
             }
@@ -84,13 +91,15 @@ public class Spritzer {
             @Override
             public void onFinish() {
                 SpannableStringBuilder builder = redHighlight(word);
-                if (builder != null) {
-                    spritz.setText(builder, TextView.BufferType.SPANNABLE);
-                    arrayList.remove(0);
-                    if (arrayList.size() != 0)
-                        countDown(spritz, arrayList);
-                }
+                spritz.setText(builder, TextView.BufferType.SPANNABLE);
+                arrayList.remove(0);
+                if (arrayList.size() != 0)
+                    countDown(spritz, arrayList);
             }
         }.start();
+    }
+
+    public CountDownTimer getTimer() {
+        return this.timer;
     }
 }
