@@ -73,49 +73,6 @@ public class MainActivity extends ActionBarActivity {
 //        mySession();
     }
 
-    private void mySession() {
-        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
-
-
-        Session session = Session.getActiveSession();
-
-
-        if (session == null) {
-            session = new Session(this);
-        }
-
-
-        Session.setActiveSession(session);
-        if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-            Session.OpenRequest request = new Session.OpenRequest(this);
-            request.setPermissions(Arrays.asList("user_groups"));
-            request.setCallback(new Session.StatusCallback() {
-                @Override
-                public void call(Session session, SessionState state, Exception exception) {
-                    if (session.isOpened())
-                        startSessionIntent(session);
-                }
-            });
-
-
-            session.openForRead(request);
-        }
-
-
-        if (session.isOpened())
-            startSessionIntent(session);
-    }
-
-
-    private void startSessionIntent(Session session) {
-        Session.setActiveSession(session);
-        Intent intent = new Intent(this, NewsFeedService.class);
-        intent.putExtra("session", session);
-
-
-        this.startService(intent);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
