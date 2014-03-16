@@ -173,9 +173,9 @@ public class FlashHead extends Service {
         int sheight = displaymetrics.heightPixels;
         int swidth = displaymetrics.widthPixels;
         Block[] blocks = Packing.calc(swidth,sheight,posts);
-
+        int tmp = 1;
         for(Block block : blocks){
-            Log.d("FlashHead",String.format("%d, %d, %d, %d",block.x,block.y,block.w,block.h));
+            Log.d("flashheadcss",String.format("*/ #d%d { left: %dpx; top:%dpx; width:%dpx; height:%dpx; } /* %f ",(tmp++),block.x,block.y,block.w,block.h,block.post.getImportance()));
             addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),
                     block.x, block.y, block.w, block.h);
         }
