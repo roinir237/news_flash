@@ -26,7 +26,12 @@ public class Packing {
 
         boolean first_row = from == 0;
 
-        int vcut = optimal_cut(inputs[from].getRenderPriority()*1.5, (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority())/1.5, w);
+        double p1v = inputs[from].getRenderPriority()*1.5;
+        double p2v = (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority())/1.5;
+        double totalV = p1v/(p1v+p2v);
+        double cutpercentv = totalV < 0.31 ? 0.31 : totalV;
+        cutpercentv = totalV > 0.63 ? 0.63 : totalV;
+        int vcut = (int)Math.round(cutpercentv*w);
         int side_width = w-vcut;
 
         result[0] = new Block(inputs[from], first_row ? 0 : side_width, top_offset, vcut, h);
