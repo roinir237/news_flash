@@ -98,8 +98,8 @@ public class Packing {
         for (PostDTO p : list) { p_sum += p.getImportance(); }
         for (PostDTO p : list) { p.setRenderPriority(p.getImportance() / p_sum); }
 
-        permute(list, 0);
-        PostDTO[] inputs = bestPermutation;
+//        permute(list, 0);
+        PostDTO[] inputs = list.toArray(new PostDTO[1]);
 
         Comparator<PostDTO> comparator = new Comparator<PostDTO>() {
             @Override
@@ -108,8 +108,16 @@ public class Packing {
             }
         };
 
-        Arrays.sort(inputs, 0, 3, comparator);
-        Arrays.sort(inputs, 3, 6, comparator);
+        Arrays.sort(inputs, 0, 6, comparator);
+
+        bestPermutation[0] = inputs[0];
+        bestPermutation[1] = inputs[4];
+        bestPermutation[2] = inputs[5];
+        bestPermutation[3] = inputs[1];
+        bestPermutation[4] = inputs[2];
+        bestPermutation[5] = inputs[3];
+
+        inputs = bestPermutation;
 
         double top_importance = sumPriority(0, 3, inputs);
         double bottom_importance = sumPriority(3, inputs.length, inputs);
