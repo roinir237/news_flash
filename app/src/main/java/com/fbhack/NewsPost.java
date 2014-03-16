@@ -42,6 +42,10 @@ public class NewsPost implements PostDTO {
     Date createdDate;
     Date updatedDate;
 
+    private boolean read = false;
+
+    public boolean isRead() { return this.read; }
+    public void setRead(boolean r) { this.read = r; }
 
     public NewsPost(JSONObject post) throws JSONException {
         likers = new LinkedList<String>();

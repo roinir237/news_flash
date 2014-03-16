@@ -85,6 +85,8 @@ public abstract class CardItem{
         this.originalY = y;
     }
 
+    abstract protected void closePost();
+
     public void addCard(final WindowManager windowManager) {
         if(view != null) {
             removeCard(windowManager);
@@ -101,6 +103,11 @@ public abstract class CardItem{
                     centerCard(windowManager);
                     centered = true;
                 }
+            }
+
+            @Override
+            protected void close() {
+                closePost();
             }
         });
 

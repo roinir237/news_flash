@@ -61,7 +61,18 @@ public class Packing {
         }
     }
 
-
+    public static List<PostDTO> getUnread(List<PostDTO> from, int n) {
+        List<PostDTO> result = new ArrayList<PostDTO>();
+        for (PostDTO p : from) {
+            if (result.size() >= n) {
+                break;
+            }
+            if (!p.isRead()) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
 
     /**
      * LAYOUT:
@@ -80,7 +91,7 @@ public class Packing {
         bestPermutationScore = 99999999;
         Block[] blocks = new Block[6];
 
-        ArrayList<PostDTO> list = new ArrayList<PostDTO>(inputList.subList(0,6));
+        List<PostDTO> list = getUnread(inputList, 6);
 
         // normalize importance
         double p_sum = 0;

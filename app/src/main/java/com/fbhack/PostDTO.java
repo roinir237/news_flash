@@ -28,4 +28,7 @@ public interface PostDTO {
     public void setImportance(double imp);
 
     public boolean hasLoaded();
+
+    public boolean isRead();
+    public void setRead(boolean r);
 }
