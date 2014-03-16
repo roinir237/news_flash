@@ -202,7 +202,7 @@ public class NewsPost implements PostDTO {
             long age = new Date().getTime() - createdDate.getTime();
             age /= 1000*60; // to minutes
             age++;
-            this.importance = 0.2 * likers.size() + 0.4 * commenters.size() + 0.1 * (hasImage ? 1.0 : 0) + 0.3 * age;
+            this.importance = 0.2 * likers.size() + 0.4 * commenters.size() + 0.1 * (hasImage ? 1000.0 : 0) + 0.3 * age;
         }
         return this.importance;
     }
