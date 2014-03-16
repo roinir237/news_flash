@@ -21,6 +21,9 @@ public interface PostDTO {
     public List<String> getLikers();
     public List<String> getCommenters();
 
+    public Date getCreatedTime();
+    public Date getUpdatedTime();
+
     public double getImportance();
 
     public boolean hasLoaded();

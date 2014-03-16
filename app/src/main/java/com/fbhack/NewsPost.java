@@ -4,11 +4,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +34,11 @@ public class NewsPost implements PostDTO {
     private List<String> commenters;
     private double importance;
 
+    Date createdDate;
+    Date updatedDate;
 
-    public NewsPost(final JSONObject post) throws JSONException {
+
+    public NewsPost(JSONObject post) throws JSONException {
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         name = post.getJSONObject("from").getString("name");
@@ -44,6 +51,36 @@ public class NewsPost implements PostDTO {
         if (post.has("comments"))
             commenters = loadUsers(post, "comments");
 
+        parseDates(post);
+
+        fetchImages(post);
+    }
+
+    private List<String> loadUsers(JSONObject post, String key) throws JSONException {
+        JSONArray arr = post.getJSONObject(key).getJSONArray("data");
+
+        List<String> output = new LinkedList<String>();
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject liker = arr.getJSONObject(i);
+            output.add(liker.getString("name"));
+        }
+
+        return output;
+    }
+
+    private void parseDates(JSONObject post) throws JSONException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
+
+        try {
+            createdDate = format.parse(post.getString("created_time"));
+            updatedDate = format.parse(post.getString("updated_time"));
+        } catch (Exception e) {
+            Log.e(NewsPost.class.toString(), e.getMessage());
+        }
+    }
+
+    private void fetchImages(final JSONObject post) throws JSONException {
         String fromId = post.getJSONObject("from").getString("id");
         final String profUrl = "http://graph.facebook.com/" + fromId + "/picture";
 
@@ -66,19 +103,6 @@ public class NewsPost implements PostDTO {
                 Log.e(NewsPost.class.toString(), "Finished loading images");
             }
         }).start();
-    }
-
-    private List<String> loadUsers(JSONObject post, String key) throws JSONException {
-        JSONArray arr = post.getJSONObject(key).getJSONArray("data");
-
-        List<String> output = new LinkedList<String>();
-
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject liker = arr.getJSONObject(i);
-            output.add(liker.getString("name"));
-        }
-
-        return output;
     }
 
     private Bitmap fetchImage(String url) {
