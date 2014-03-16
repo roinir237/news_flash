@@ -128,6 +128,8 @@ public class Spritzer {
             time *= 1.3;
         else if (s.contains("."))
             time *= 1.7;
+        else if (s.equals(" "))
+            time *= 1.5;
 
         if (stopWords.contains(s))
             time *= 0.6;
