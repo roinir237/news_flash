@@ -25,10 +25,11 @@ public class SpritzerTextView extends TextView {
     private String mTestString;
     private boolean mDefaultClickListener = false;
     private int mAdditonalPadding;
-
+    private boolean cancel = false;
 
     public SpritzerTextView(Context context,AttributeSet attrs) {
         super(context, attrs);
+        this.setClickable(true);
         init();
     }
 
@@ -94,5 +95,7 @@ public class SpritzerTextView extends TextView {
         // plus half the pivot character
         return (getPaint().measureText(mTestString, 0, 1) * (6 + .50f));
     }
+
+
 }
 

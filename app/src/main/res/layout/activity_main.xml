@@ -33,6 +33,8 @@
         android:id = "@+id/spritz_view"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:onClick="onClick"
+        android:clickable="true"
         android:typeface="monospace"
         android:background="@drawable/spritz_bg"/>
 

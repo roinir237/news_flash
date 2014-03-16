@@ -50,6 +50,8 @@ public class MainActivity extends ActionBarActivity {
 
         SpritzerTextView spritz = (SpritzerTextView) findViewById(R.id.spritz_view);
         Spritzer spritzer = new Spritzer(spritz);
+        SpritzerTextViewListener listener = new SpritzerTextViewListener(spritzer.getTimer());
+        spritz.setOnClickListener(listener);
 
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
@@ -131,41 +133,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    private void populateArrayList(ArrayList<CharSequence> arrayList) {
-        arrayList.add("Make");
-        arrayList.add("sure");
-        arrayList.add("you've");
-        arrayList.add("installed");
-        arrayList.add("the");
-        arrayList.add("following");
-        arrayList.add("from");
-        arrayList.add("the");
-        arrayList.add("Android");
-        arrayList.add("SDK");
-        arrayList.add("Manager");
-        arrayList.add("before");
-        arrayList.add("building");
-    }
 
-
-    private void countDown(final TextView spritz, final ArrayList<CharSequence> arrayList) {
-        CountDownTimer timer = new CountDownTimer(1000, 1000) {
-            @Override
-            public void onTick(long l) {
-
-
-            }
-
-
-            @Override
-            public void onFinish() {
-                spritz.setText(arrayList.get(0));
-                arrayList.remove(0);
-                if (arrayList.size() != 0)
-                    countDown(spritz, arrayList);
-            }
-        }.start();
-    }
 
 
     @Override
