@@ -26,7 +26,12 @@ public class Packing {
 
         boolean first_row = from == 0;
 
-        int vcut = optimal_cut(inputs[from].getRenderPriority()*1.5, (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority())/1.5, w);
+        double p1v = inputs[from].getRenderPriority()*1.5;
+        double p2v = (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority())/1.5;
+        double totalV = p1v/(p1v+p2v);
+        double cutpercentv = totalV < 0.31 ? 0.31 : totalV;
+        cutpercentv = totalV > 0.63 ? 0.63 : totalV;
+        int vcut = (int)Math.round(cutpercentv*w);
         int side_width = w-vcut;
 
         result[0] = new Block(inputs[from], first_row ? 0 : side_width, top_offset, vcut, h);
@@ -98,8 +103,8 @@ public class Packing {
         for (PostDTO p : list) { p_sum += p.getImportance(); }
         for (PostDTO p : list) { p.setRenderPriority(p.getImportance() / p_sum); }
 
-        permute(list, 0);
-        PostDTO[] inputs = bestPermutation;
+//        permute(list, 0);
+        PostDTO[] inputs = list.toArray(new PostDTO[1]);
 
         Comparator<PostDTO> comparator = new Comparator<PostDTO>() {
             @Override
@@ -108,8 +113,16 @@ public class Packing {
             }
         };
 
-        Arrays.sort(inputs, 0, 3, comparator);
-        Arrays.sort(inputs, 3, 6, comparator);
+        Arrays.sort(inputs, 0, 6, comparator);
+
+        bestPermutation[0] = inputs[0];
+        bestPermutation[1] = inputs[4];
+        bestPermutation[2] = inputs[5];
+        bestPermutation[3] = inputs[1];
+        bestPermutation[4] = inputs[2];
+        bestPermutation[5] = inputs[3];
+
+        inputs = bestPermutation;
 
         double top_importance = sumPriority(0, 3, inputs);
         double bottom_importance = sumPriority(3, inputs.length, inputs);

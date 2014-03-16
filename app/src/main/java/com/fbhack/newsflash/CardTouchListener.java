@@ -29,18 +29,14 @@ public abstract class CardTouchListener implements View.OnTouchListener {
                 return true;
 
             case MotionEvent.ACTION_UP:
-                if(motionEvent.getEventTime() - downTime < tapDownTime){
+                float final_x = motionEvent.getRawX();
+                float final_y = motionEvent.getRawY();
+                Log.d("listenerev", String.format("Mouse up at %fx%f", final_x, final_y));
+                if (Math.sqrt(Math.pow(final_x - start_x, 2)+Math.pow(final_y-start_y,2)) >= THRESHOLD) {
+                    Log.d("listenerev", "THRESHOLD MET");
+                    close();
+                } else if(motionEvent.getEventTime() - downTime < tapDownTime){
                     onTap();
-                } else {
-                    float final_x = motionEvent.getRawX();
-                    float final_y = motionEvent.getRawY();
-                    Log.d("listenerev", String.format("Mouse up at %fx%f", final_x, final_y));
-                    if (Math.abs(final_x - start_x) >= THRESHOLD || Math.abs(final_y - start_y) >= THRESHOLD) {
-                        Log.d("listenerev", "THRESHOLD MET");
-                        close();
-                    } else {
-                        Log.d("listenerv", "THRESHOLD NOT MET");
-                    }
                 }
                 return true;
         }
