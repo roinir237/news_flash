@@ -97,7 +97,10 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
             @Override
             public void onTap() {
-                toggleMode();
+                List<PostDTO> posts = newsFetcher.getPosts();
+                if(posts.size() >= 6){
+                    toggleMode();
+                }
             }
 
             @Override
@@ -187,7 +190,7 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
         int swidth = displaymetrics.widthPixels;
         Block[] blocks = Packing.calc(swidth,sheight,posts);
 
-        float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
 
         for(Block block : blocks){
             Log.d("FlashHead",String.format("%d, %d, %d, %d",block.x,block.y,block.w,block.h));
@@ -196,13 +199,13 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
             int x = (int)(block.x + margin);
             int y = (int) (block.y + margin);
 
-            addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),
+            addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),block.post.getPostedImage(),
                     x,y,width,height);
         }
     }
 
-    public void addStatusCard(Bitmap pic, String status,int x, int y, int w, int h){
-        StatusItem card = new StatusItem(this,this,pic,status);
+    public void addStatusCard(Bitmap pic, String status,Bitmap previewPic,int x, int y, int w, int h){
+        StatusItem card = new StatusItem(this,this,pic,status,previewPic);
         card.setDims(h,w);
         card.setPosition(x,y);
         cards.add(card);
