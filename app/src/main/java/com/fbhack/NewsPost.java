@@ -148,7 +148,11 @@ public class NewsPost implements PostDTO {
 
     @Override
     public double getImportance() {
-        return 0.3 * likers.size() + 0.7 * commenters.size() + (hasImage ? 1.0 : 0);
+        Date mostRecent = createdDate.compareTo(updatedDate) > 0 ? createdDate : updatedDate;
+        long age = new Date().getTime() - mostRecent.getTime();
+        age /= 1000*60; // to minutes
+        if (age == 0) { age = 1; }
+        return 0.2 * likers.size() + 0.4 * commenters.size() + 0.1 * (hasImage ? 1.0 : 0) + 0.3 * age;
     }
 
     @Override
