@@ -1,5 +1,8 @@
 package com.fbhack.newsflash;
 
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +10,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,15 +24,22 @@ import android.widget.ImageView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
+import com.fbhack.PostDTO;
+import com.fbhack.processing.Block;
+import com.fbhack.processing.Packing;
+import com.fbhack.services.NewsFetcher;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FlashHead extends Service {
     private static final String TAG = "FlashHead";
     private WindowManager windowManager;
     private View flashHead;
+    private NewsFetcher newsFetcher;
+    private Looper mServiceLooper;
 
     private ArrayList<CardItem> cards;
 
@@ -37,8 +49,16 @@ public class FlashHead extends Service {
 
     public void onCreate(){
         super.onCreate();
-        Intent i = new Intent();
-        Bundle b = new Bundle();
+
+        HandlerThread thread = new HandlerThread("ServiceStartArguments",
+                Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+        mServiceLooper = thread.getLooper();
+        newsFetcher = new NewsFetcher(mServiceLooper);
+        Message msg = newsFetcher.obtainMessage();
+        msg.arg1 = 1;
+        newsFetcher.sendMessage(msg);
+
         LayoutInflater inflater = LayoutInflater.from(this);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -123,13 +143,9 @@ public class FlashHead extends Service {
                         @Override
                         public void onSpringAtRest(Spring spring) {
                             super.onSpringAtRest(spring);
-                            DisplayMetrics displaymetrics = new DisplayMetrics();
-                            ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displaymetrics);
-                            int sheight = displaymetrics.heightPixels;
-                            int swidth = displaymetrics.widthPixels;
-                            Bitmap pic  = BitmapFactory.decodeResource(getResources(),R.drawable.test);
-                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6 + 100,sheight/2 - sheight/6 + 100,swidth/3,sheight/3);
-                            addStatusCard(pic,"making progress @londonFbHackathon",swidth/2 - swidth/6 - 100,sheight/2 - sheight/6 - 100,swidth/3,sheight/3);
+
+                            List<PostDTO> posts = newsFetcher.getPosts();
+                            showPosts(posts);
                         }
 
                     });
@@ -149,6 +165,20 @@ public class FlashHead extends Service {
                 }
             }
         });
+    }
+
+    public void showPosts(List<PostDTO> posts){
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
+        int sheight = displaymetrics.heightPixels;
+        int swidth = displaymetrics.widthPixels;
+        Block[] blocks = Packing.calc(swidth,sheight,posts);
+
+        for(Block block : blocks){
+            Log.d("FlashHead",String.format("%d, %d, %d, %d",block.x,block.y,block.w,block.h));
+            addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),
+                    block.x, block.y, block.w, block.h);
+        }
     }
 
     public void addStatusCard(Bitmap pic, String status,int x, int y, int w, int h){

@@ -36,6 +36,8 @@ public class NewsPost implements PostDTO {
 
 
     public NewsPost(JSONObject post) throws JSONException {
+        likers = new LinkedList<String>();
+        commenters = new LinkedList<String>();
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         name = post.getJSONObject("from").getString("name");
@@ -148,7 +150,7 @@ public class NewsPost implements PostDTO {
 
     @Override
     public double getImportance() {
-        return 0.3 * likers.size() + 0.7 * commenters.size() + (hasImage ? 1.0 : 0);
+        return 0.3 * likers.size() + 0.7 * commenters.size() + (hasImage ? 1.0 : 0) + 1;
     }
 
     @Override

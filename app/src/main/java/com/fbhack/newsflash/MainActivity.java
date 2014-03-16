@@ -50,7 +50,7 @@ public class MainActivity extends ActionBarActivity {
         //ArrayList<CharSequence> arrayList = new ArrayList<CharSequence>();
        // populateArrayList(arrayList);
         //countDown(spritz, arrayList);
-        startService(new Intent(this, FlashHead.class));
+
 
         Button buttonLoginActivity = (Button) findViewById(R.id.button);
         buttonLoginActivity.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +65,7 @@ public class MainActivity extends ActionBarActivity {
         buttonService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, NewsFeedService.class);
-                startService(intent);
+                MainActivity.this.startService(new Intent(MainActivity.this, FlashHead.class));
             }
         });
 

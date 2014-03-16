@@ -3,23 +3,10 @@ package com.fbhack.processing;
 import java.util.*;
 import com.fbhack.*;
 
-class Block {
-    public int x;
-    public int y;
-    public int w;
-    public int h;
-    public PostDTO post;
-
-    public Block(PostDTO post, int x, int y, int w, int h) {
-        this.post = post;
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-    }
-}
 
 public class Packing {
+
+
     public static int optimal_cut(double i1, double i2, int size) {
         double total = i1+i2;
         double cut = i1/total;
