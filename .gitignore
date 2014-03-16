@@ -20,3 +20,5 @@ facebook/build
 *.ipr
 *~
 *.swp
+
+local.properties
