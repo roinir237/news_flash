@@ -97,7 +97,8 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
             @Override
             public void onTap() {
-                toggleMode();
+                if (newsFetcher.getPosts().size() >= 6)
+                    toggleMode();
             }
 
             @Override

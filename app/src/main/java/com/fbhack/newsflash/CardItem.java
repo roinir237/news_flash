@@ -3,6 +3,7 @@ package com.fbhack.newsflash;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -135,7 +136,12 @@ public abstract class CardItem{
                 params.height = height;
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
             }
         });
         SpringConfig config = new SpringConfig(50,7);
@@ -144,7 +150,11 @@ public abstract class CardItem{
     }
 
     public void removeCard(WindowManager windowManager) {
-        windowManager.removeView(view);
+        try {
+            windowManager.removeView(view);
+        } catch (Exception e) {
+            Log.e("CardItem", e.getLocalizedMessage());
+        }
     }
 
     public void centerCard(final WindowManager windowManager){
@@ -187,7 +197,11 @@ public abstract class CardItem{
 
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
             }
 
             @Override
@@ -234,7 +248,11 @@ public abstract class CardItem{
 
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
             }
         });
 
