@@ -7,6 +7,7 @@ import com.facebook.model.GraphObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by shaundowling on 15/03/2014.
@@ -19,7 +20,7 @@ public interface PostDTO {
     public Bitmap getPostedImage();
 
     public List<String> getLikers();
-    public List<String> getCommenters();
+    public Map<String, String> getCommenters();
 
     public Date getCreatedTime();
     public Date getUpdatedTime();
