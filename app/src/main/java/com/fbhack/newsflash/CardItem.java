@@ -136,36 +136,37 @@ public abstract class CardItem{
         } else {
             int containerWidth = finalWidth;
 
+
         }
 
 
-        spring.addListener(new SimpleSpringListener() {
-
-            @Override
-            public void onSpringUpdate(Spring spring) {
-                float value = (float) spring.getCurrentValue();
-
-                int width = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalWidth*0.7,finalWidth);
-                int height = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalHeight*0.7,finalHeight);
-
-                int x = (int) (finalX + (finalWidth - width)/2);
-                int y = (int) (finalY + (finalHeight - height)/2);
-
-                params.width = width;
-                params.height = height;
-                params.x = x;
-                params.y = y;
-
-                try {
-                    windowManager.updateViewLayout(view, params);
-                } catch (Exception e) {
-                    Log.e("CardItem", e.getLocalizedMessage());
-                }
-            }
-        });
-        SpringConfig config = new SpringConfig(50,10);
-        spring.setSpringConfig(config);
-        spring.setEndValue(1);
+//        spring.addListener(new SimpleSpringListener() {
+//
+//            @Override
+//            public void onSpringUpdate(Spring spring) {
+//                float value = (float) spring.getCurrentValue();
+//
+//                int width = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalWidth*0.7,finalWidth);
+//                int height = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalHeight*0.7,finalHeight);
+//
+//                int x = (int) (finalX + (finalWidth - width)/2);
+//                int y = (int) (finalY + (finalHeight - height)/2);
+//
+//                params.width = width;
+//                params.height = height;
+//                params.x = x;
+//                params.y = y;
+//
+//                try {
+//                    windowManager.updateViewLayout(view, params);
+//                } catch (Exception e) {
+//                    Log.e("CardItem", e.getLocalizedMessage());
+//                }
+//            }
+//        });
+//        SpringConfig config = new SpringConfig(50,10);
+//        spring.setSpringConfig(config);
+//        spring.setEndValue(1);
     }
 
     public void removeCard(WindowManager windowManager) {
