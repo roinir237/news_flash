@@ -27,10 +27,10 @@ import com.nineoldandroids.animation.ObjectAnimator;
 public abstract class CardItem{
     private WindowManager.LayoutParams params;
     private Context mContext;
-    private View view;
     private boolean centered = false;
     private int originalX;
     private int originalY;
+    protected View view;
 
     public interface CardsChangedCallback {
         void cardCentered(CardItem card);
@@ -155,7 +155,12 @@ public abstract class CardItem{
                 params.height = height;
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
             }
         });
         SpringConfig config = new SpringConfig(50,10);
@@ -164,7 +169,11 @@ public abstract class CardItem{
     }
 
     public void removeCard(WindowManager windowManager) {
-        windowManager.removeView(view);
+        try {
+            windowManager.removeView(view);
+        } catch (Exception e) {
+            Log.e("CardItem", e.getLocalizedMessage());
+        }
     }
 
     public void centerCard(final WindowManager windowManager){
@@ -207,7 +216,18 @@ public abstract class CardItem{
 
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void onSpringAtRest(Spring spring) {
+                super.onSpringAtRest(spring);
+
+                CardItem.this.swapView(windowManager);
             }
         });
 
@@ -216,6 +236,8 @@ public abstract class CardItem{
         callback.cardCentered(this);
         spring.setEndValue(1);
     }
+
+    public abstract void swapView(WindowManager windowManager);
 
     public void decenterCard(final WindowManager windowManager, View overlay) {
         windowManager.removeView(overlay);
@@ -230,6 +252,13 @@ public abstract class CardItem{
         spring.addListener(new SimpleSpringListener() {
 
             @Override
+            public void onSpringActivate(Spring spring) {
+                super.onSpringActivate(spring);
+                
+                CardItem.this.swapView(windowManager);
+            }
+
+            @Override
             public void onSpringUpdate(Spring spring) {
                 float value = (float) spring.getCurrentValue();
 
@@ -238,7 +267,11 @@ public abstract class CardItem{
 
                 params.x = x;
                 params.y = y;
-                windowManager.updateViewLayout(view, params);
+                try {
+                    windowManager.updateViewLayout(view, params);
+                } catch (Exception e) {
+                    Log.e("CardItem", e.getLocalizedMessage());
+                }
             }
         });
 

@@ -4,21 +4,29 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.fbhack.processing.GoogleImage;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
+
 /**
  * Created by shaundowling on 15/03/2014.
  */
 public class NewsPost implements PostDTO {
-    private String name;
+    private String name = "";
 
     private String status;
 
@@ -40,7 +48,10 @@ public class NewsPost implements PostDTO {
         commenters = new LinkedList<String>();
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
-        name = post.getJSONObject("from").getString("name");
+        JSONObject from = post.getJSONObject("from");
+
+        if (from.has("name"))
+            name = from.getString("name");
 
         status = post.has("message") ? post.getString("message") : "";
 
@@ -62,7 +73,9 @@ public class NewsPost implements PostDTO {
 
         for (int i = 0; i < arr.length(); i++) {
             JSONObject liker = arr.getJSONObject(i);
-            output.add(liker.getString("name"));
+
+            if (liker.has("name"))
+                output.add(liker.getString("name"));
         }
 
         return output;
@@ -99,9 +112,44 @@ public class NewsPost implements PostDTO {
                     }
                 }
 
+                if (!hasImage) {
+                    String url = getNounsURL(status);
+                    image = url != null ? fetchImage(url) : null;
+                }
+
                 Log.e(NewsPost.class.toString(), "Finished loading images");
             }
         }).start();
+    }
+
+    private String getNounsURL(String sentence) {
+
+        MaxentTagger tagger = null;
+        File file = new File("left3words-wsj-0-18.tagger");
+        if (true)
+            return null;
+        tagger = new MaxentTagger(file.getAbsolutePath());
+
+        if (tagger == null) {
+            return null;
+        }
+
+        String tagged = tagger.tagString(sentence);
+        List<String> nouns = extractNouns(tagged);
+        return nouns.size() > 0 ? GoogleImage.fetch(nouns.get(0)) : null;
+    }
+
+    private List<String> extractNouns(String tagged) {
+        List<String> nouns = new LinkedList<String>();
+
+        String[] pairs = tagged.split(" ");
+        for (String pair : pairs) {
+            String[] tuple = pair.split("/");
+            if (tuple[1].equals("NN"))
+                nouns.add(tuple[0]);
+        }
+
+        return nouns;
     }
 
     private Bitmap fetchImage(String url) {
