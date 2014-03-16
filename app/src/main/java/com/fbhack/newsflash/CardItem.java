@@ -4,24 +4,38 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import com.facebook.rebound.SpringUtil;
 
 /**
  * Created by roinir on 15/03/2014.
  */
-public abstract class CardItem {
+public abstract class CardItem{
     private WindowManager.LayoutParams params;
     private Context mContext;
     private View view;
+    private boolean centered = false;
+    private int originalX;
+    private int originalY;
+
+    public interface CardsChangedCallback {
+        void cardCentered(CardItem card);
+    }
+
+    final private CardsChangedCallback callback;
 
     protected abstract View getView();
 
-    public CardItem(Context context){
+    public CardItem(Context context,CardsChangedCallback callback ){
+        this.callback = callback;
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -66,6 +80,9 @@ public abstract class CardItem {
         params.x = x;
         params.width = w;
         params.height = h;
+
+        this.originalX = x;
+        this.originalY = y;
     }
 
     public void addCard(final WindowManager windowManager) {
@@ -76,6 +93,17 @@ public abstract class CardItem {
 
         final WindowManager.LayoutParams params = getParams();
         view = getView();
+
+        view.setOnTouchListener(new CardTouchListener() {
+            @Override
+            protected void onTap() {
+                if(!centered){
+                    centerCard(windowManager);
+                    centered = true;
+                }
+            }
+        });
+
         final int finalWidth = params.width;
         final int finalHeight = params.height;
         final int finalX = params.x;
@@ -97,8 +125,8 @@ public abstract class CardItem {
             public void onSpringUpdate(Spring spring) {
                 float value = (float) spring.getCurrentValue();
 
-                int width = (int) ((value + 1) * 0.5 * finalWidth);
-                int height = (int) ((value + 1) * 0.5 * finalHeight);
+                int width = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalWidth*0.7,finalWidth);
+                int height = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,finalHeight*0.7,finalHeight);
 
                 int x = (int) (finalX + (finalWidth - width)/2);
                 int y = (int) (finalY + (finalHeight - height)/2);
@@ -110,11 +138,91 @@ public abstract class CardItem {
                 windowManager.updateViewLayout(view, params);
             }
         });
-
+        SpringConfig config = new SpringConfig(50,7);
+        spring.setSpringConfig(config);
         spring.setEndValue(1);
     }
 
     public void removeCard(WindowManager windowManager) {
         windowManager.removeView(view);
+    }
+
+    public void centerCard(final WindowManager windowManager){
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
+        int sheight = displaymetrics.heightPixels;
+        int swidth = displaymetrics.widthPixels;
+
+        final int finalX = swidth/2 - params.width/2;
+        final int finalY = sheight/2 - params.height/2;
+        final int initialX = params.x;
+        final int initialY = params.y;
+        windowManager.removeView(view);
+        final View overlay = LayoutInflater.from(getContext()).inflate(R.layout.overlay, null);
+        overlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                decenterCard(windowManager,overlay);
+            }
+        });
+        WindowManager.LayoutParams overlayParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+        windowManager.addView(overlay,overlayParams);
+        windowManager.addView(view,params);
+
+        SpringSystem springSystem = SpringSystem.create();
+        Spring spring = springSystem.createSpring();
+        spring.addListener(new SimpleSpringListener() {
+
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                float value = (float) spring.getCurrentValue();
+
+                int x = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,initialX,finalX);
+                int y = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,initialY,finalY);
+
+                params.x = x;
+                params.y = y;
+                windowManager.updateViewLayout(view, params);
+            }
+        });
+
+        windowManager.removeView(view);
+        windowManager.addView(view,params);
+        callback.cardCentered(this);
+        spring.setEndValue(1);
+    }
+
+    public void decenterCard(final WindowManager windowManager, View overlay) {
+        windowManager.removeView(overlay);
+
+        final int finalX = this.originalX;
+        final int finalY = this.originalY;
+        final int initialX = params.x;
+        final int initialY = params.y;
+
+        SpringSystem springSystem = SpringSystem.create();
+        Spring spring = springSystem.createSpring();
+        spring.addListener(new SimpleSpringListener() {
+
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                float value = (float) spring.getCurrentValue();
+
+                int x = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,initialX,finalX);
+                int y = (int) SpringUtil.mapValueFromRangeToRange(value,0,1,initialY,finalY);
+
+                params.x = x;
+                params.y = y;
+                windowManager.updateViewLayout(view, params);
+            }
+        });
+
+        spring.setEndValue(1);
+        centered = false;
     }
 }

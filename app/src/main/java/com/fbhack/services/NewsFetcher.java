@@ -1,5 +1,8 @@
 package com.fbhack.services;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.facebook.HttpMethod;
@@ -21,66 +24,61 @@ import java.util.Map;
 /**
  * Created by shaundowling on 15/03/2014.
  */
-public class NewsFetcher {
+public class NewsFetcher extends Handler {
 
     private Map<String, PostDTO> newsFeed = new HashMap<String, PostDTO>();
 
-    public NewsFetcher() {
-        startFetching();
+    public NewsFetcher(Looper looper) {
+        super(looper);
     }
 
+
+    @Override
+    public void handleMessage(Message msg) {
+        startFetching();
+    }
     /**
      * At the moment this just does one fetch.
      */
-    private void startFetching() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    // If we want to put extra options
-//                Bundle options = new Bundle();
-//                options.putInt("limit", 10);
+    public void startFetching() {
 
-                    Log.d(NewsFetcher.class.toString(), "Awaiting response");
-                    Response res = new Request(
-                            Session.getActiveSession(),
-                            "/me/home",
-                            null,
-                            HttpMethod.GET
-                    ).executeAndWait();
+        Log.d(NewsFetcher.class.toString(), "Awaiting response");
+        Response res = new Request(
+                Session.getActiveSession(),
+                "/me/home",
+                null,
+                HttpMethod.GET
+        ).executeAndWait();
 
-                    Log.d(NewsFetcher.class.toString(), "Received response");
+        Log.d(NewsFetcher.class.toString(), "Received response");
 
-                    if (res.getError() == null)
-                        processResponse(res);
-                    else
-                        Log.e(NewsFetcher.class.toString(), "Error getting response");
+        if (res.getError() == null)
+            processResponse(res);
+        else
+            Log.e(NewsFetcher.class.toString(), "Error getting response");
 
-                    try {
-                        Thread.sleep(10000);
-                    } catch (Exception e) {
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
 
-                    }
+        }
 
-                    Log.d(NewsFetcher.class.toString(), "Finished loading feed");
-
-                    break;
-                }
-            }
-        }).start();
+        Log.d(NewsFetcher.class.toString(), "Finished loading feed");
     }
 
     private void processResponse(Response response) {
         JSONArray data = (JSONArray) response.getGraphObject().getProperty("data");
 
-        try {
-            for (int i = 0; i < data.length(); i++) {
+
+        for (int i = 0; i < data.length(); i++) {
+            try {
                 JSONObject post = data.getJSONObject(i);
                 processPost(post);
+            } catch (JSONException exc) {
+                Log.e(NewsFetcher.class.toString(), exc.getLocalizedMessage());
             }
-        } catch (JSONException exc) {
-            Log.e(NewsFetcher.class.toString(), exc.getLocalizedMessage());
         }
+
     }
 
     private void processPost(JSONObject post) throws JSONException {

@@ -60,7 +60,7 @@ public class LoginUsingActivityActivity extends Activity {
             Session.setActiveSession(session);
             if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
                 Session.OpenRequest request = new Session.OpenRequest(this);
-                request.setPermissions(Arrays.asList("user_groups"));
+                request.setPermissions(Arrays.asList("read_stream", "user_groups"));
                 request.setCallback(statusCallback);
                 session.openForRead(request);
             }
@@ -102,6 +102,7 @@ public class LoginUsingActivityActivity extends Activity {
             buttonLoginLogout.setOnClickListener(new OnClickListener() {
                 public void onClick(View view) { onClickLogout(); }
             });
+
         } else {
             textInstructionsOrLink.setText(R.string.instructions);
             buttonLoginLogout.setText(R.string.login);
