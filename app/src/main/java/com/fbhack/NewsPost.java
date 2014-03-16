@@ -16,8 +16,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
@@ -36,7 +38,7 @@ public class NewsPost implements PostDTO {
     private Bitmap image;
 
     private List<String> likers;
-    private List<String> commenters;
+    private Map<String, String> commenters;
     private Double importance = null;
 
     Date createdDate;
@@ -49,7 +51,7 @@ public class NewsPost implements PostDTO {
 
     public NewsPost(JSONObject post) throws JSONException {
         likers = new LinkedList<String>();
-        commenters = new LinkedList<String>();
+        commenters = new HashMap<String, String>();
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         JSONObject from = post.getJSONObject("from");
@@ -63,7 +65,7 @@ public class NewsPost implements PostDTO {
             likers = loadUsers(post, "likes");
 
         if (post.has("comments"))
-            commenters = loadUsers(post, "comments");
+            commenters = loadComments(post, "comments");
 
         parseDates(post);
 
@@ -80,6 +82,21 @@ public class NewsPost implements PostDTO {
 
             if (liker.has("name"))
                 output.add(liker.getString("name"));
+        }
+
+        return output;
+    }
+
+    private Map<String, String> loadComments(JSONObject post, String key) throws JSONException {
+        JSONArray arr = post.getJSONObject(key).getJSONArray("data");
+
+        Map<String, String> output = new HashMap<String, String>();
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject liker = arr.getJSONObject(i);
+
+            if (liker.has("from"))
+                output.put(liker.getJSONObject("from").getString("name"), liker.getString("message"));
         }
 
         return output;
@@ -196,7 +213,7 @@ public class NewsPost implements PostDTO {
     }
 
     @Override
-    public List<String> getCommenters() {
+    public Map<String, String> getCommenters() {
         return commenters;
     }
 
