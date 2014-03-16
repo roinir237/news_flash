@@ -9,14 +9,25 @@ import android.widget.TextView;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Dorota on 16/03/14.
  */
 public class Spritzer {
+    private static final int BASE_TIME = 180;
     CountDownTimer timer;
+    SpritzerTextView spritz;
+    HashSet<String> stopWords = new HashSet<String>();
 
     protected Spritzer(SpritzerTextView spritz) {
+        String csvStops = "a,able,about,across,after,all,almost,also,am,among,an,and,any,are,as,at,be,because,been,but,by,can,cannot,could,dear,did,do,does,either,else,ever,every,for,from,get,got,had,has,have,he,her,hers,him,his,how,however,i,if,in,into,is,it,its,just,least,let,like,likely,may,me,might,most,must,my,neither,no,nor,not,of,off,often,on,only,or,other,our,own,rather,said,say,says,she,should,since,so,some,than,that,the,their,them,then,there,these,they,this,tis,to,too,twas,us,wants,was,we,were,what,when,where,which,while,who,whom,why,will,with,would,yet,you,your";
+
+        for (String s : csvStops.split(","))
+            stopWords.add(s);
+
         ArrayList<String> arrayList = populateArrayList();
         spritz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -24,7 +35,8 @@ public class Spritzer {
                 timer.cancel();
             }
         });
-        countDown(spritz, arrayList);
+        spritz.setText("");
+        this.spritz = spritz;
     }
 
     /**
@@ -80,10 +92,20 @@ public class Spritzer {
         return builder;
     }
 
-    private void countDown(final SpritzerTextView spritz, final ArrayList<String> arrayList) {
-        final String word = arrayList.get(0);
+    public void countDown(final List<String> list) {
+        final List<String> arrayList = new LinkedList<String>();
 
-        timer = new CountDownTimer(1000, 1000) {
+        for (String s : list) {
+            if (s.length() > 0)
+                arrayList.add(s);
+        }
+
+        if (arrayList == null || arrayList.size() == 0)
+            return;
+
+        final String word = arrayList.get(0);
+        int time = getCountdownForString(word);
+        timer = new CountDownTimer(time, time) {
             @Override
             public void onTick(long l) {
             }
@@ -94,12 +116,30 @@ public class Spritzer {
                 spritz.setText(builder, TextView.BufferType.SPANNABLE);
                 arrayList.remove(0);
                 if (arrayList.size() != 0)
-                    countDown(spritz, arrayList);
+                    countDown(arrayList);
             }
         }.start();
+    }
+
+    private int getCountdownForString(String s) {
+        int time = BASE_TIME;
+
+        if (s.contains(","))
+            time *= 1.3;
+        else if (s.contains("."))
+            time *= 1.7;
+
+        if (stopWords.contains(s))
+            time *= 0.6;
+        else if (s.length() > 5)
+            time *= 1.0;
+
+
+        return time;
     }
 
     public CountDownTimer getTimer() {
         return this.timer;
     }
+
 }

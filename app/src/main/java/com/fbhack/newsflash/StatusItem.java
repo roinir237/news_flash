@@ -12,6 +12,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
 /**
  * Created by roinir on 15/03/2014.
  */
@@ -50,7 +52,7 @@ public class StatusItem extends CardItem {
     }
 
     public void swapView(WindowManager windowManager) {
-        if (!spritzView) {
+        if (!spritzView && status != null && status.length() > 0) {
             windowManager.removeView(this.view);
 
 
@@ -80,15 +82,21 @@ public class StatusItem extends CardItem {
 
             SpritzerTextView textView = (SpritzerTextView) spritzerTextView.findViewById(R.id.spritz_view_2);
             textView.setTextSize(30);
-            new Spritzer(textView);
 
-        } else {
+            Spritzer spritzer = new Spritzer(textView);
+            spritzer.countDown(Arrays.asList(status.split(" ")));
+
+            spritzView = !spritzView;
+
+        } else if (spritzView) {
             WindowManager.LayoutParams params = (WindowManager.LayoutParams) view.getLayoutParams();
             windowManager.removeView(spritzerTextView);
 
             windowManager.addView(this.view, params);
+
+            spritzView = !spritzView;
         }
 
-        spritzView = !spritzView;
+
     }
 }
