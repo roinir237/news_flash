@@ -44,7 +44,12 @@ public class NewsPost implements PostDTO {
     Date createdDate;
     Date updatedDate;
 
+    private double renderPriority;
+
     private boolean read = false;
+
+    public double getRenderPriority() { return renderPriority; }
+    public  void setRenderPriority(double p) { this.renderPriority = p; }
 
     public boolean isRead() { return this.read; }
     public void setRead(boolean r) { this.read = r; }
