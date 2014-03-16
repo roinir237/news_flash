@@ -42,7 +42,8 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
     private View flashHead;
     private NewsFetcher newsFetcher;
     private Looper mServiceLooper;
-
+    private View overlay;
+    private WindowManager.LayoutParams overlayParams;
     private ArrayList<CardItem> cards;
 
     public FlashHead() {
@@ -157,15 +158,9 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
                     spring.setEndValue(1);
 
-//                    params.dimAmount = 0.8f;
-//                    params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-//                    windowManager.updateViewLayout(flashHead, params);
-
                     fullscreen = true;
 
                 } else {
-                    params.flags ^= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-                    windowManager.updateViewLayout(flashHead, params);
                     removeAllCards();
                     fullscreen = !fullscreen;
                 }
@@ -174,6 +169,18 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
     }
 
     public void showPosts(List<PostDTO> posts){
+        if(overlay == null){
+            overlay = LayoutInflater.from(this).inflate(R.layout.overlay, null);
+            overlayParams = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        }
+
+        windowManager.addView(overlay,overlayParams);
+
         DisplayMetrics displaymetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(displaymetrics);
         int sheight = displaymetrics.heightPixels;
@@ -204,6 +211,7 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
     }
 
     public void removeAllCards(){
+        windowManager.removeView(overlay);
         for(CardItem card : cards){
             card.removeCard(windowManager);
         }
@@ -224,31 +232,7 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
     @Override
     public void cardCentered(CardItem card) {
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
-        int swidth = displaymetrics.widthPixels;
-        final WindowManager.LayoutParams params = (WindowManager.LayoutParams) flashHead.getLayoutParams();
-
-        final int initialX = params.x;
-        if(initialX >= card.getParams().x && initialX <= card.getParams().x + card.getParams().width){
-            final int finalX = initialX > swidth / 2 ? swidth:0;
-
-            SpringSystem springSystem = SpringSystem.create();
-            Spring spring = springSystem.createSpring();
-            spring.addListener(new SimpleSpringListener() {
-
-                @Override
-                public void onSpringUpdate(Spring spring) {
-                    float value = (float) spring.getCurrentValue();
-                    int xi = (int) (initialX - value * (initialX - finalX));
-                    params.x = xi;
-                    windowManager.updateViewLayout(flashHead, params);
-
-                }
-
-            });
-
-            spring.setEndValue(1);
-        }
+      windowManager.removeView(flashHead);
+      windowManager.addView(flashHead,flashHead.getLayoutParams());
     }
 }
