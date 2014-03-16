@@ -13,26 +13,28 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fbhack.PostDTO;
+
 import java.util.Arrays;
 
 /**
  * Created by roinir on 15/03/2014.
  */
 public class StatusItem extends CardItem {
-    private final String status;
-    private final Bitmap pic;
-    private final Bitmap previewImage;
+
+    private final PostDTO post;
     private View spritzerTextView;
     private boolean spritzView = false;
 
-    public StatusItem(Context context,CardsChangedCallback callback, Bitmap profilePic, String status, Bitmap previewImage) {
+    public StatusItem(Context context,CardsChangedCallback callback, PostDTO post) {
         super(context,callback);
-        this.pic = profilePic;
-        this.status = status;
-        this.previewImage = previewImage;
-
+        this.post = post;
 
         spritzerTextView = LayoutInflater.from(getContext()).inflate(R.layout.spritz_view, null);
+    }
+
+    public PostDTO getPost() {
+        return this.post;
     }
 
     @Override
@@ -44,9 +46,9 @@ public class StatusItem extends CardItem {
         View card;
         if(params.height > previewImageLimit){
             card = LayoutInflater.from(getContext()).inflate(R.layout.status_card, null);
-            if (this.previewImage != null){
+            if (this.post.getPostedImage() != null){
                 ImageView profilePic = (ImageView) card.findViewById(R.id.preview_pic);
-                profilePic.setImageBitmap(this.previewImage);
+                profilePic.setImageBitmap(this.post.getPostedImage());
             }
 
         }else{
@@ -55,16 +57,23 @@ public class StatusItem extends CardItem {
         }
 
         ImageView profilePic = (ImageView) card.findViewById(R.id.profile_pic);
-        profilePic.setImageBitmap(this.pic);
+        profilePic.setImageBitmap(this.post.getProfilePicture());
 
         TextView statusField = (TextView) card.findViewById(R.id.status_field);
-        statusField.setText(this.status);
+        statusField.setText(this.post.getStatus());
 
         return card;
     }
 
+    @Override
+    protected void closePost() {
+        Log.d("listenerev", "closePost() called");
+        this.post.setRead(true);
+        this.getCallback().cardRemoved();
+    }
+
     public void swapView(WindowManager windowManager) {
-        if (!spritzView && status != null && status.length() > 0) {
+        if (!spritzView && this.post.getStatus() != null && this.post.getStatus().length() > 0) {
             windowManager.removeView(this.view);
 
 
@@ -96,7 +105,7 @@ public class StatusItem extends CardItem {
             textView.setTextSize(30);
 
             Spritzer spritzer = new Spritzer(textView);
-            spritzer.countDown(Arrays.asList(status.split(" ")));
+            spritzer.countDown(Arrays.asList(this.post.getStatus().split(" ")));
 
             spritzView = !spritzView;
 

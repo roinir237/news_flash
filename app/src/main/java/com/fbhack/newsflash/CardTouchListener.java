@@ -1,6 +1,7 @@
 package com.fbhack.newsflash;
 
 import android.graphics.Point;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -8,7 +9,7 @@ import android.view.View;
 /**
  * Created by roinir on 15/03/2014.
  */
-public abstract class CardTouchListener implements View.OnTouchListener, View.OnDragListener {
+public abstract class CardTouchListener implements View.OnTouchListener {
     private long downTime;
     private static final long tapDownTime = 250;
 
@@ -24,6 +25,7 @@ public abstract class CardTouchListener implements View.OnTouchListener, View.On
                 downTime = motionEvent.getEventTime();
                 start_x = motionEvent.getRawX();
                 start_y = motionEvent.getRawY();
+                Log.d("listenerev", String.format("Mouse down at %fx%f", start_x, start_y));
                 return true;
 
             case MotionEvent.ACTION_UP:
@@ -32,29 +34,18 @@ public abstract class CardTouchListener implements View.OnTouchListener, View.On
                 } else {
                     float final_x = motionEvent.getRawX();
                     float final_y = motionEvent.getRawY();
+                    Log.d("listenerev", String.format("Mouse up at %fx%f", final_x, final_y));
                     if (Math.abs(final_x - start_x) >= THRESHOLD || Math.abs(final_y - start_y) >= THRESHOLD) {
+                        Log.d("listenerev", "THRESHOLD MET");
                         close();
+                    } else {
+                        Log.d("listenerv", "THRESHOLD NOT MET");
                     }
                 }
                 return true;
         }
 
         return false;
-    }
-
-    @Override
-    public boolean onDrag(View v, DragEvent event) {
-
-        switch (event.getAction()) {
-            case DragEvent.ACTION_DRAG_ENTERED:
-                start_x = event.getX();
-                start_y = event.getY();
-                break;
-            case DragEvent.ACTION_DRAG_ENDED:
-                break;
-        }
-
-        }
     }
 
     protected abstract void close();

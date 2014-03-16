@@ -34,9 +34,12 @@ public abstract class CardItem{
 
     public interface CardsChangedCallback {
         void cardCentered(CardItem card);
+        void cardRemoved();
     }
 
     final private CardsChangedCallback callback;
+
+    protected CardsChangedCallback getCallback() { return this.callback; }
 
     protected abstract View getView();
 
@@ -113,6 +116,7 @@ public abstract class CardItem{
 
             @Override
             protected void close() {
+                Log.d("listeverev", "close() got called");
                 closePost();
             }
         });

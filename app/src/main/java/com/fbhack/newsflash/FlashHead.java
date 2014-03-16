@@ -46,8 +46,17 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
     private WindowManager.LayoutParams overlayParams;
     private ArrayList<CardItem> cards;
 
+    private List<PostDTO> posts;
+
     public FlashHead() {
         cards = new ArrayList<CardItem>();
+    }
+
+    public List<PostDTO> getPosts() {
+        if (this.posts == null) {
+            this.posts = newsFetcher.getPosts();
+        }
+        return this.posts;
     }
 
     public void onCreate(){
@@ -97,7 +106,7 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
             @Override
             public void onTap() {
-                List<PostDTO> posts = newsFetcher.getPosts();
+                getPosts();
                 if(posts.size() >= 6){
                     toggleMode();
                 }
@@ -181,9 +190,9 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
         }
-
+        try {
         windowManager.addView(overlay,overlayParams);
-
+        } catch(Exception e) { /* happy hack */}
         DisplayMetrics displaymetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(displaymetrics);
         int sheight = displaymetrics.heightPixels;
@@ -199,13 +208,12 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
             int x = (int)(block.x + margin);
             int y = (int) (block.y + margin);
 
-            addStatusCard(block.post.getProfilePicture(), block.post.getStatus(),block.post.getPostedImage(),
-                    x,y,width,height);
+            addStatusCard(block.post, x, y, width, height);
         }
     }
 
-    public void addStatusCard(Bitmap pic, String status,Bitmap previewPic,int x, int y, int w, int h){
-        StatusItem card = new StatusItem(this,this,pic,status,previewPic);
+    public void addStatusCard(PostDTO post,int x, int y, int w, int h){
+        StatusItem card = new StatusItem(this,this,post);
         card.setDims(h,w);
         card.setPosition(x,y);
         cards.add(card);
@@ -236,5 +244,10 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
     public void cardCentered(CardItem card) {
       windowManager.removeView(flashHead);
       windowManager.addView(flashHead,flashHead.getLayoutParams());
+    }
+
+    @Override
+    public void cardRemoved() {
+        showPosts(this.posts);
     }
 }
