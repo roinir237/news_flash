@@ -2,7 +2,10 @@ package com.fbhack;
 
 import android.graphics.Bitmap;
 
+import com.facebook.model.GraphObject;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +19,10 @@ public interface PostDTO {
     public Bitmap getPostedImage();
 
     public List<String> getLikers();
+    public List<String> getCommenters();
+
+    public Date getCreatedTime();
+    public Date getUpdatedTime();
 
     public double getImportance();
 
