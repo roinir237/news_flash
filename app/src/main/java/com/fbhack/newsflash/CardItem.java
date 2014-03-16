@@ -147,14 +147,16 @@ public abstract class CardItem{
 
 
             int containerWidth = finalWidth;
-            int containerHeight = (int) (finalHeight - bottomHeight);
+            int containerHeight = (int) (finalHeight);
 
             int newHeight;
             int newWidth;
 
             Bitmap previewBmp = ((BitmapDrawable)preview.getDrawable()).getBitmap();
+            int h = previewBmp.getHeight();
+            int w = previewBmp.getWidth();
 
-            if(previewBmp.getHeight() > previewBmp.getWidth()){
+            if(previewBmp.getHeight() < previewBmp.getWidth()){
                 newHeight = containerHeight;
                 newWidth = containerHeight*previewWidth/previewHeight;
             } else {
@@ -163,13 +165,13 @@ public abstract class CardItem{
             }
 
             ViewGroup.LayoutParams imageParams = preview.getLayoutParams();
-
-            preview.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, newWidth, newHeight, false));
-
             imageParams.width = newWidth;
             imageParams.height = newHeight;
-
+            preview.setScaleType(ImageView.ScaleType.CENTER_CROP);
             preview.setLayoutParams(imageParams);
+            preview.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, newWidth, newHeight, false));
+
+
         } else {
             int containerWidth = finalWidth;
             float longLimit  = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getContext().getResources().getDisplayMetrics());
