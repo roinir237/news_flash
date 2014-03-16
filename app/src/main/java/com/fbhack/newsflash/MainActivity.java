@@ -50,8 +50,7 @@ public class MainActivity extends ActionBarActivity {
 
         SpritzerTextView spritz = (SpritzerTextView) findViewById(R.id.spritz_view);
         Spritzer spritzer = new Spritzer(spritz);
-        SpritzerTextViewListener listener = new SpritzerTextViewListener(spritzer.getTimer());
-        spritz.setOnClickListener(listener);
+
 
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()

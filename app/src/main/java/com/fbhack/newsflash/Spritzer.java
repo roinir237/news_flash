@@ -18,6 +18,12 @@ public class Spritzer {
 
     protected Spritzer(SpritzerTextView spritz) {
         ArrayList<String> arrayList = populateArrayList();
+        spritz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timer.cancel();
+            }
+        });
         countDown(spritz, arrayList);
     }
 
