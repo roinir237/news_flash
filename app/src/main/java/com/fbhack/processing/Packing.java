@@ -13,10 +13,10 @@ public class Packing {
         return (int)Math.round(size*cut);
     }
 
-    public static double sumImportance(int from, int to, PostDTO inputs[]) {
+    public static double sumPriority(int from, int to, PostDTO inputs[]) {
         double imp = 0;
         for (int i=from;i<to;i++) {
-            imp+=inputs[i].getImportance();
+            imp+=inputs[i].getRenderPriority();
         }
         return imp;
     }
@@ -26,12 +26,12 @@ public class Packing {
 
         boolean first_row = from == 0;
 
-        int vcut = optimal_cut(inputs[from].getImportance()*1.5, (inputs[from+1].getImportance() + inputs[from+2].getImportance())/1.5, w);
+        int vcut = optimal_cut(inputs[from].getRenderPriority()*1.5, (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority())/1.5, w);
         int side_width = w-vcut;
 
         result[0] = new Block(inputs[from], first_row ? 0 : side_width, top_offset, vcut, h);
 
-        double cutpercent = inputs[from+1].getImportance() / (inputs[from+1].getImportance() + inputs[from+2].getImportance());
+        double cutpercent = inputs[from+1].getRenderPriority() / (inputs[from+1].getRenderPriority() + inputs[from+2].getRenderPriority());
         cutpercent = (0.2 * cutpercent) + 0.4;
 
         int hcut = (int)Math.round(cutpercent * h);
@@ -52,7 +52,7 @@ public class Packing {
             java.util.Collections.swap(arr, k, i);
         }
 
-        double pScore = (arr.get(0).getImportance() + arr.get(1).getImportance() + arr.get(2).getImportance()) - (arr.get(3).getImportance() + arr.get(4).getImportance() + arr.get(5).getImportance());
+        double pScore = (arr.get(0).getRenderPriority() + arr.get(1).getRenderPriority() + arr.get(2).getRenderPriority()) - (arr.get(3).getRenderPriority() + arr.get(4).getRenderPriority() + arr.get(5).getRenderPriority());
         pScore = Math.abs(pScore);
 
         if (pScore < bestPermutationScore) {
@@ -96,7 +96,7 @@ public class Packing {
         // normalize importance
         double p_sum = 0;
         for (PostDTO p : list) { p_sum += p.getImportance(); }
-        for (PostDTO p : list) { p.setImportance(p.getImportance() / p_sum); }
+        for (PostDTO p : list) { p.setRenderPriority(p.getImportance() / p_sum); }
 
         permute(list, 0);
         PostDTO[] inputs = bestPermutation;
@@ -104,15 +104,15 @@ public class Packing {
         Comparator<PostDTO> comparator = new Comparator<PostDTO>() {
             @Override
             public int compare(PostDTO p1, PostDTO p2) {
-                return new Double(p2.getImportance()).compareTo(p1.getImportance());
+                return new Double(p2.getRenderPriority()).compareTo(p1.getRenderPriority());
             }
         };
 
         Arrays.sort(inputs, 0, 3, comparator);
         Arrays.sort(inputs, 3, 6, comparator);
 
-        double top_importance = sumImportance(0,3,inputs);
-        double bottom_importance = sumImportance(3,inputs.length,inputs);
+        double top_importance = sumPriority(0, 3, inputs);
+        double bottom_importance = sumPriority(3, inputs.length, inputs);
 
         int row_cut = optimal_cut(top_importance, bottom_importance, screenHeight);
 

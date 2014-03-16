@@ -31,4 +31,7 @@ public interface PostDTO {
 
     public boolean isRead();
     public void setRead(boolean r);
+
+    public double getRenderPriority();
+    public void setRenderPriority(double p);
 }

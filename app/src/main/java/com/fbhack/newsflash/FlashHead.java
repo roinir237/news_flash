@@ -248,6 +248,7 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
 
     @Override
     public void cardRemoved() {
+        removeAllCards();
         showPosts(this.posts);
     }
 }
