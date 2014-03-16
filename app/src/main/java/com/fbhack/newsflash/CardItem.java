@@ -26,9 +26,16 @@ public abstract class CardItem{
     private int originalX;
     private int originalY;
 
+    public interface CardsChangedCallback {
+        void cardCentered(CardItem card);
+    }
+
+    final private CardsChangedCallback callback;
+
     protected abstract View getView();
 
-    public CardItem(Context context){
+    public CardItem(Context context,CardsChangedCallback callback ){
+        this.callback = callback;
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -92,6 +99,7 @@ public abstract class CardItem{
             protected void onTap() {
                 if(!centered){
                     centerCard(windowManager);
+                    centered = true;
                 }
             }
         });
@@ -185,7 +193,7 @@ public abstract class CardItem{
 
         windowManager.removeView(view);
         windowManager.addView(view,params);
-
+        callback.cardCentered(this);
         spring.setEndValue(1);
     }
 
@@ -215,6 +223,6 @@ public abstract class CardItem{
         });
 
         spring.setEndValue(1);
-
+        centered = false;
     }
 }
