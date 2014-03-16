@@ -36,7 +36,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         SpritzerTextView spritz = (SpritzerTextView) findViewById(R.id.spritz_view);
-        Spritzer spritzer = new Spritzer(spritz);
+            Spritzer spritzer = new Spritzer(spritz);
 
 
 //        if (savedInstanceState == null) {

@@ -7,10 +7,12 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -138,16 +140,53 @@ public abstract class CardItem{
 
         ImageView preview = (ImageView) view.findViewById(R.id.preview_pic);
         if(preview != null){
-            Bitmap previewBmp = ((BitmapDrawable)preview.getDrawable()).getBitmap();
+            float bottomHeight  = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getContext().getResources().getDisplayMetrics());
+
             int previewWidth = ((BitmapDrawable)preview.getDrawable()).getBitmap().getWidth();
             int previewHeight = ((BitmapDrawable)preview.getDrawable()).getBitmap().getHeight();
+
+
             int containerWidth = finalWidth;
-            float ratio = containerWidth*previewHeight/previewWidth;
-            preview.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, containerWidth, (int)(ratio), false));
+            int containerHeight = (int) (finalHeight - bottomHeight);
+
+            int newHeight;
+            int newWidth;
+
+            Bitmap previewBmp = ((BitmapDrawable)preview.getDrawable()).getBitmap();
+
+            if(previewBmp.getHeight() > previewBmp.getWidth()){
+                newHeight = containerHeight;
+                newWidth = containerHeight*previewWidth/previewHeight;
+            } else {
+                newWidth = containerWidth;
+                newHeight = containerWidth*previewHeight/previewWidth;
+            }
+
+            ViewGroup.LayoutParams imageParams = preview.getLayoutParams();
+
+            preview.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, newWidth, newHeight, false));
+
+            imageParams.width = newWidth;
+            imageParams.height = newHeight;
+
+            preview.setLayoutParams(imageParams);
         } else {
             int containerWidth = finalWidth;
+            float longLimit  = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getContext().getResources().getDisplayMetrics());
+            if(longLimit > containerWidth){
+                params.height = containerWidth;
+                windowManager.updateViewLayout(view,params);
 
+                view.findViewById(R.id.status_field).setVisibility(View.GONE);
+                ImageView profilePic = (ImageView) view.findViewById(R.id.profile_pic);
+         //       Bitmap previewBmp = ((BitmapDrawable)profilePic.getDrawable()).getBitmap();
+                ViewGroup.LayoutParams imageParams = profilePic.getLayoutParams();
+                imageParams.width = containerWidth;
+                imageParams.height = containerWidth;
+                profilePic.setLayoutParams(imageParams);
+           //     profilePic.setImageBitmap(Bitmap.createScaledBitmap(previewBmp, containerWidth, containerWidth, false));
 
+            }
         }
 
 
