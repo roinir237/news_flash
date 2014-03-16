@@ -187,7 +187,6 @@ public class FlashHead extends Service implements CardItem.CardsChangedCallback 
         int swidth = displaymetrics.widthPixels;
         Block[] blocks = Packing.calc(swidth,sheight,posts);
 
-
         float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
 
         for(Block block : blocks){

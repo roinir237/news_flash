@@ -25,6 +25,7 @@ public interface PostDTO {
     public Date getUpdatedTime();
 
     public double getImportance();
+    public void setImportance(double imp);
 
     public boolean hasLoaded();
 }
