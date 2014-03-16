@@ -9,6 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
  */
 public class NewsPost implements PostDTO {
     private String name;
+
     private String status;
 
     private Bitmap profilePic;
@@ -24,11 +27,15 @@ public class NewsPost implements PostDTO {
     boolean hasImage;
     private Bitmap image;
 
-    private List<String> likers = new LinkedList<String>();
+    private List<String> likers;
+    private List<String> commenters;
     private double importance;
 
+    Date createdDate;
+    Date updatedDate;
 
-    public NewsPost(final JSONObject post) throws JSONException {
+
+    public NewsPost(JSONObject post) throws JSONException {
         Log.d(this.getClass().toString(), "Loading NewsPost");
 
         name = post.getJSONObject("from").getString("name");
@@ -36,8 +43,41 @@ public class NewsPost implements PostDTO {
         status = post.has("message") ? post.getString("message") : "";
 
         if (post.has("likes"))
-            loadLikers(post.getJSONObject("likes").getJSONArray("data"));
+            likers = loadUsers(post, "likes");
 
+        if (post.has("comments"))
+            commenters = loadUsers(post, "comments");
+
+        parseDates(post);
+
+        fetchImages(post);
+    }
+
+    private List<String> loadUsers(JSONObject post, String key) throws JSONException {
+        JSONArray arr = post.getJSONObject(key).getJSONArray("data");
+
+        List<String> output = new LinkedList<String>();
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject liker = arr.getJSONObject(i);
+            output.add(liker.getString("name"));
+        }
+
+        return output;
+    }
+
+    private void parseDates(JSONObject post) throws JSONException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
+
+        try {
+            createdDate = format.parse(post.getString("created_time"));
+            updatedDate = format.parse(post.getString("updated_time"));
+        } catch (Exception e) {
+            Log.e(NewsPost.class.toString(), e.getMessage());
+        }
+    }
+
+    private void fetchImages(final JSONObject post) throws JSONException {
         String fromId = post.getJSONObject("from").getString("id");
         final String profUrl = "http://graph.facebook.com/" + fromId + "/picture";
 
@@ -60,14 +100,6 @@ public class NewsPost implements PostDTO {
                 Log.e(NewsPost.class.toString(), "Finished loading images");
             }
         }).start();
-    }
-
-    private void loadLikers(JSONArray likersJson) throws JSONException {
-
-        for (int i = 0; i < likersJson.length(); i++) {
-            JSONObject liker = likersJson.getJSONObject(i);
-            likers.add(liker.getString("name"));
-        }
     }
 
     private Bitmap fetchImage(String url) {
@@ -110,12 +142,27 @@ public class NewsPost implements PostDTO {
     }
 
     @Override
+    public List<String> getCommenters() {
+        return commenters;
+    }
+
+    @Override
     public double getImportance() {
-        return likers.size();
+        return 0.3 * likers.size() + 0.7 * commenters.size() + (hasImage ? 1.0 : 0);
     }
 
     @Override
     public boolean hasLoaded() {
         return hasImage ? image != null : profilePic != null;
+    }
+
+    @Override
+    public Date getCreatedTime() {
+        return null;
+    }
+
+    @Override
+    public Date getUpdatedTime() {
+        return null;
     }
 }
