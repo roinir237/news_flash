@@ -16,6 +16,10 @@ import android.widget.TextView;
 import com.fbhack.PostDTO;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by roinir on 15/03/2014.
@@ -105,7 +109,25 @@ public class StatusItem extends CardItem {
             textView.setTextSize(30);
 
             Spritzer spritzer = new Spritzer(textView);
-            spritzer.countDown(Arrays.asList(this.post.getStatus().split(" ")));
+
+            List<String> spritzText = new LinkedList<String>();
+
+            for (String s : this.post.getStatus().split(" "))
+                spritzText.add(s);
+
+            Map<String, String> comments = this.post.getCommenters();
+
+            for (String s : comments.keySet()) {
+                String comment = comments.get(s);
+
+                spritzText.add(" ");
+                spritzText.addAll(Arrays.asList(s.split(" ")));
+                spritzText.add("said");
+
+                spritzText.addAll(Arrays.asList(comment.split(" ")));
+            }
+
+            spritzer.countDown(spritzText);
 
             spritzView = !spritzView;
 
