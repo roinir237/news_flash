@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cardContent"
     android:layout_width="200dp"
-    android:layout_height="150dp"
+    android:layout_height="165dp"
     android:background="@drawable/card_background_shadow"
     android:orientation="vertical">
 
@@ -17,15 +17,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:background="#CCC">
         <TextView
             android:id="@+id/status_field"
             android:layout_width="200dp"
-            android:layout_height="100dp"
+            android:layout_height="50dp"
             android:text="this is some sample text"
             android:textColor="#333333"
-            android:layout_margin="10dp"/>
+            android:padding="10dp"/>
 
     </LinearLayout>
 

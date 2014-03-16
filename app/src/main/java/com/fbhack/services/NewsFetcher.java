@@ -69,14 +69,16 @@ public class NewsFetcher extends Handler {
     private void processResponse(Response response) {
         JSONArray data = (JSONArray) response.getGraphObject().getProperty("data");
 
-        try {
-            for (int i = 0; i < data.length(); i++) {
+
+        for (int i = 0; i < data.length(); i++) {
+            try {
                 JSONObject post = data.getJSONObject(i);
                 processPost(post);
+            } catch (JSONException exc) {
+                Log.e(NewsFetcher.class.toString(), exc.getLocalizedMessage());
             }
-        } catch (JSONException exc) {
-            Log.e(NewsFetcher.class.toString(), exc.getLocalizedMessage());
         }
+
     }
 
     private void processPost(JSONObject post) throws JSONException {
